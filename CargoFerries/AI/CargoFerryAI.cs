@@ -629,9 +629,10 @@ namespace CargoFerries.AI
                 Building.Flags.Active) == Building.Flags.None)
         this.SetTarget(vehicleID, ref data, (ushort) 0);
 
-      SimulationStep1(vehicleID, ref data, physicsLodRefPos);
+      SimulationStep1(vehicleID, ref data, physicsLodRefPos); //TODO: restore to call to base
     }
 
+    //reproduces FerryAI.SimulationStep
     public void SimulationStep1(ushort vehicleID, ref Vehicle data, Vector3 physicsLodRefPos)
     {
       if ((data.m_flags & Vehicle.Flags.WaitingPath) != ~(Vehicle.Flags.Created | Vehicle.Flags.Deleted |
