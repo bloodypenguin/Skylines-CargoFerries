@@ -182,7 +182,7 @@ namespace CargoFerries.AI
     public override void CreateVehicle(ushort vehicleID, ref Vehicle data)
     {
       base.CreateVehicle(vehicleID, ref data);
-      UnityEngine.Debug.LogWarning("Create vehicle!");
+      UnityEngine.Debug.LogWarning($"CreateVehicle: vehicleId={vehicleID}");
       data.m_flags |= Vehicle.Flags.WaitingTarget;
       data.m_flags |= Vehicle.Flags.WaitingCargo;
       data.m_flags |= Vehicle.Flags.WaitingLoading;
@@ -191,7 +191,7 @@ namespace CargoFerries.AI
 
     public override void ReleaseVehicle(ushort vehicleID, ref Vehicle data)
     {
-      UnityEngine.Debug.LogWarning("Release vehicle!");
+      UnityEngine.Debug.LogWarning($"ReleaseVehicle: vehicleId={vehicleID}");
       this.RemoveSource(vehicleID, ref data);
       this.RemoveTarget(vehicleID, ref data);
       base.ReleaseVehicle(vehicleID, ref data);
@@ -211,12 +211,11 @@ namespace CargoFerries.AI
 
     public override void SetSource(ushort vehicleID, ref Vehicle data, ushort sourceBuilding)
     {
-      UnityEngine.Debug.LogWarning($"Set source : {sourceBuilding}!");
+      UnityEngine.Debug.LogWarning($"SetSource: vehicleID={vehicleID}, sourceBuilding={sourceBuilding}!");
       this.RemoveSource(vehicleID, ref data);
       data.m_sourceBuilding = sourceBuilding;
       if (sourceBuilding == (ushort) 0)
         return;
-      UnityEngine.Debug.LogWarning("Set source: unspawn!");
       data.Unspawn(vehicleID);
       BuildingManager instance = Singleton<BuildingManager>.instance;
       Vector3 position;
@@ -238,7 +237,7 @@ namespace CargoFerries.AI
       data.m_targetPos2 = data.m_targetPos0;
       data.m_targetPos3 = data.m_targetPos0;
       this.FrameDataUpdated(vehicleID, ref data, ref data.m_frame0);
-      UnityEngine.Debug.LogWarning("Adding own vehicle!");
+      UnityEngine.Debug.LogWarning($"SetSource: Adding own vehicle: sourceBuilding={sourceBuilding} vehicleID={vehicleID}");
       Singleton<BuildingManager>.instance.m_buildings.m_buffer[(int) sourceBuilding].AddOwnVehicle(vehicleID, ref data);
       if ((Singleton<BuildingManager>.instance.m_buildings.m_buffer[(int) sourceBuilding].m_flags &
            Building.Flags.IncomingOutgoing) == Building.Flags.None)
@@ -292,7 +291,7 @@ namespace CargoFerries.AI
 
     public override void SetTarget(ushort vehicleID, ref Vehicle data, ushort targetBuilding)
     {
-      UnityEngine.Debug.LogWarning($"Set target : {targetBuilding}!");
+      UnityEngine.Debug.LogWarning($"SetTarget: vehicleID={vehicleID}, targetBuilding={targetBuilding}!");
       if ((int) targetBuilding != (int) data.m_targetBuilding)
       {
         this.RemoveTarget(vehicleID, ref data);
@@ -310,6 +309,7 @@ namespace CargoFerries.AI
         data.m_waitCounter = (byte) 0;
         if (targetBuilding != (ushort) 0)
         {
+          UnityEngine.Debug.LogWarning($"SetTarget: Adding guest vehicle: vehicleID={vehicleID}, targetBuilding={targetBuilding}!");
           Singleton<BuildingManager>.instance.m_buildings.m_buffer[(int) targetBuilding]
             .AddGuestVehicle(vehicleID, ref data);
           if ((Singleton<BuildingManager>.instance.m_buildings.m_buffer[(int) targetBuilding].m_flags &
@@ -397,7 +397,6 @@ namespace CargoFerries.AI
                                                            Vehicle.Flags.LeftHandDrive) ||
           this.StartPathFind(vehicleID, ref data))
         return;
-      UnityEngine.Debug.LogWarning("Set target: unspawn!");
       data.Unspawn(vehicleID);
     }
 
@@ -505,7 +504,6 @@ namespace CargoFerries.AI
                                                            Vehicle.Flags.Transition | Vehicle.Flags.InsideBuilding |
                                                            Vehicle.Flags.LeftHandDrive))
       {
-        // UnityEngine.Debug.LogWarning("waiting for cargo");
         bool flag = Singleton<SimulationManager>.instance.m_randomizer.Int32(2U) == 0;
         if (!flag && data.m_sourceBuilding != (ushort) 0 &&
             (Singleton<BuildingManager>.instance.m_buildings.m_buffer[(int) data.m_sourceBuilding].m_flags &
@@ -515,7 +513,6 @@ namespace CargoFerries.AI
             (Singleton<BuildingManager>.instance.m_buildings.m_buffer[(int) data.m_targetBuilding].m_flags &
              Building.Flags.Active) == Building.Flags.None)
           flag = true;
-        // UnityEngine.Debug.LogWarning($"flag: {flag}");
         if (!flag)
         {
           data.m_waitCounter = (int) data.m_transferSize < this.m_cargoCapacity
@@ -554,7 +551,6 @@ namespace CargoFerries.AI
                             Vehicle.Flags.LeftHandDrive;
             data.m_flags |= Vehicle.Flags.Leaving;
             data.m_waitCounter = (byte) 0;
-            UnityEngine.Debug.LogWarning("Start pathfinding");
             this.StartPathFind(vehicleID, ref data);
           }
         }
@@ -577,7 +573,7 @@ namespace CargoFerries.AI
                                                            Vehicle.Flags.Transition | Vehicle.Flags.InsideBuilding |
                                                            Vehicle.Flags.LeftHandDrive))
       {
-        UnityEngine.Debug.LogWarning("stopped");
+        UnityEngine.Debug.LogWarning($"SimulationStep: stopped vehicleID={vehicleID}");
         if ((data.m_flags & Vehicle.Flags.Spawned) != ~(Vehicle.Flags.Created | Vehicle.Flags.Deleted |
                                                         Vehicle.Flags.Spawned | Vehicle.Flags.Inverted |
                                                         Vehicle.Flags.TransferToTarget |
@@ -597,7 +593,6 @@ namespace CargoFerries.AI
                                                         Vehicle.Flags.LeftHandDrive) &&
             ++data.m_waitCounter == (byte) 16)
         {
-          UnityEngine.Debug.LogWarning("spawned");
           data.m_flags &= Vehicle.Flags.Created | Vehicle.Flags.Deleted | Vehicle.Flags.Spawned |
                           Vehicle.Flags.Inverted | Vehicle.Flags.TransferToTarget | Vehicle.Flags.TransferToSource |
                           Vehicle.Flags.Emergency1 | Vehicle.Flags.Emergency2 | Vehicle.Flags.WaitingPath |
@@ -775,20 +770,19 @@ namespace CargoFerries.AI
                                                            Vehicle.Flags.LeftHandDrive) &&
         data.m_cargoParent == (ushort) 0)
       {
-        UnityEngine.Debug.LogWarning("Release 1");
         Singleton<VehicleManager>.instance.ReleaseVehicle(vehicleID);
       }
       else
       {
         if ((int) data.m_blockCounter != num1)
           return;
-        UnityEngine.Debug.LogWarning("Release 2");
         Singleton<VehicleManager>.instance.ReleaseVehicle(vehicleID);
       }
     }
 
     private bool ArriveAtTarget(ushort vehicleID, ref Vehicle data)
     {
+      UnityEngine.Debug.LogWarning($"ArriveAtTarget. vehicleId={vehicleID}");
       VehicleManager instance = Singleton<VehicleManager>.instance;
       ushort vehicleID1 = data.m_firstCargo;
       data.m_firstCargo = (ushort) 0;
@@ -831,7 +825,6 @@ namespace CargoFerries.AI
         ushort nextCargo = instance.m_vehicles.m_buffer[(int) vehicle].m_nextCargo;
         instance.m_vehicles.m_buffer[(int) vehicle].m_nextCargo = (ushort) 0;
         instance.m_vehicles.m_buffer[(int) vehicle].m_cargoParent = (ushort) 0;
-        UnityEngine.Debug.LogWarning("ArriveAtSource: release");
         instance.ReleaseVehicle(vehicle);
         vehicle = nextCargo;
         if (++num > 16384)
@@ -848,6 +841,7 @@ namespace CargoFerries.AI
 
     public override bool ArriveAtDestination(ushort vehicleID, ref Vehicle vehicleData)
     {
+      UnityEngine.Debug.LogWarning($"ArriveAtDestination. vehicleID={vehicleID}");
       if ((vehicleData.m_flags & Vehicle.Flags.WaitingTarget) != ~(Vehicle.Flags.Created | Vehicle.Flags.Deleted |
                                                                    Vehicle.Flags.Spawned | Vehicle.Flags.Inverted |
                                                                    Vehicle.Flags.TransferToTarget |
@@ -912,6 +906,7 @@ namespace CargoFerries.AI
               .m_targetBuilding;
             if (targetBuilding != (ushort) 0)
             {
+              UnityEngine.Debug.LogWarning($"ArriveAtDestination - switch cargo parent: nextCargoParent={nextCargoParent}, vehicleID={vehicleID}");
               CargoTruckAI.SwitchCargoParent(nextCargoParent, vehicleID);
               vehicleData.m_waitCounter = (byte) 0;
               vehicleData.m_flags &= Vehicle.Flags.Created | Vehicle.Flags.Deleted | Vehicle.Flags.Spawned |
@@ -959,7 +954,6 @@ namespace CargoFerries.AI
           }
         }
 
-        UnityEngine.Debug.LogWarning("ArriveAtDestination: release");
         Singleton<VehicleManager>.instance.ReleaseVehicle(vehicleID);
         return true;
       }
@@ -1073,7 +1067,6 @@ namespace CargoFerries.AI
 
     protected override bool StartPathFind(ushort vehicleID, ref Vehicle vehicleData)
     {
-      UnityEngine.Debug.LogWarning("StartPathFind");
       if (vehicleData.m_leadingVehicle == (ushort) 0)
       {
         Vector3 startPos =
@@ -1128,7 +1121,6 @@ namespace CargoFerries.AI
               ref instance.m_buildings.m_buffer[(int) vehicleData.m_sourceBuilding], ref randomizer, this.m_info,
               out position, out Vector3 _);
             var startPathFind = this.StartPathFind(vehicleID, ref vehicleData, startPos, position);
-            UnityEngine.Debug.LogWarning($"Parent start pathfind to source: {startPathFind}");
             return startPathFind;
           }
         }
@@ -1142,276 +1134,11 @@ namespace CargoFerries.AI
             ref instance.m_buildings.m_buffer[(int) vehicleData.m_targetBuilding], ref randomizer, this.m_info,
             out position, out Vector3 _);
           var startPathFind = this.StartPathFind(vehicleID, ref vehicleData, startPos, position);
-          UnityEngine.Debug.LogWarning($"Parent start pathfind to target: {startPathFind}");
           return startPathFind;
         }
       }
-
-      UnityEngine.Debug.LogWarning($"Own start pathfind: false");
       return false;
     }
-
-    protected override bool StartPathFind(
-      ushort vehicleID,
-      ref Vehicle vehicleData,
-      Vector3 startPos,
-      Vector3 endPos)
-    {
-      if ((double) Vector3.SqrMagnitude(endPos - startPos) >= 100.0)
-        return this.StartPathFind(vehicleID, ref vehicleData, startPos, endPos, true, true);
-      UnityEngine.Debug.LogWarning($"sqr magnitude is less!");
-      if (vehicleData.m_path != 0U)
-      {
-        Singleton<PathManager>.instance.ReleasePath(vehicleData.m_path);
-        vehicleData.m_path = 0U;
-      }
-
-      vehicleData.m_flags &= Vehicle.Flags.Created | Vehicle.Flags.Deleted | Vehicle.Flags.Spawned |
-                             Vehicle.Flags.Inverted | Vehicle.Flags.TransferToTarget | Vehicle.Flags.TransferToSource |
-                             Vehicle.Flags.Emergency1 | Vehicle.Flags.Emergency2 | Vehicle.Flags.Stopped |
-                             Vehicle.Flags.Leaving | Vehicle.Flags.Arriving | Vehicle.Flags.Reversed |
-                             Vehicle.Flags.TakingOff | Vehicle.Flags.Flying | Vehicle.Flags.Landing |
-                             Vehicle.Flags.WaitingSpace | Vehicle.Flags.WaitingCargo | Vehicle.Flags.GoingBack |
-                             Vehicle.Flags.WaitingTarget | Vehicle.Flags.Importing | Vehicle.Flags.Exporting |
-                             Vehicle.Flags.Parking | Vehicle.Flags.CustomName | Vehicle.Flags.OnGravel |
-                             Vehicle.Flags.WaitingLoading | Vehicle.Flags.Congestion | Vehicle.Flags.DummyTraffic |
-                             Vehicle.Flags.Underground | Vehicle.Flags.Transition | Vehicle.Flags.InsideBuilding |
-                             Vehicle.Flags.LeftHandDrive;
-      vehicleData.m_targetPos0 = (Vector4) endPos;
-      vehicleData.m_targetPos0.w = 2f;
-      vehicleData.m_targetPos1 = vehicleData.m_targetPos0;
-      vehicleData.m_targetPos2 = vehicleData.m_targetPos0;
-      vehicleData.m_targetPos3 = vehicleData.m_targetPos0;
-      this.TrySpawn(vehicleID, ref vehicleData);
-      return true;
-    }
-
-    protected virtual bool StartPathFind(
-      ushort vehicleID,
-      ref Vehicle vehicleData,
-      Vector3 startPos,
-      Vector3 endPos,
-      bool startBothWays,
-      bool endBothWays)
-    {
-      VehicleInfo info = this.m_info;
-      PathUnit.Position pathPosA1;
-      PathUnit.Position pathPosB1;
-      float distanceSqrA1;
-      PathUnit.Position pathPosA2;
-      PathUnit.Position pathPosB2;
-      float distanceSqrA2;
-      var startPosFound = FindPathPosition(startPos, ItemClass.Service.PublicTransport, NetInfo.LaneType.Vehicle,
-        info.m_vehicleType, false, false, 64f, out pathPosA1, out pathPosB1, out distanceSqrA1, out float _);
-      var endPosFound = FindPathPosition(endPos, ItemClass.Service.PublicTransport, NetInfo.LaneType.Vehicle,
-        info.m_vehicleType, false, false, 64f, out pathPosA2, out pathPosB2, out distanceSqrA2, out float _);
-      UnityEngine.Debug.LogWarning($"StartPathFind-  startPosFound: {startPosFound}, endPosFound: {endPosFound}");
-      if (startPosFound && endPosFound)
-      {
-        if (!startBothWays || (double) distanceSqrA1 < 10.0)
-          pathPosB1 = new PathUnit.Position();
-        if (!endBothWays || (double) distanceSqrA2 < 10.0)
-          pathPosB2 = new PathUnit.Position();
-        uint unit;
-        if (Singleton<PathManager>.instance.CreatePath(out unit, ref Singleton<SimulationManager>.instance.m_randomizer,
-          Singleton<SimulationManager>.instance.m_currentBuildIndex, pathPosA1, pathPosB1, pathPosA2, pathPosB2,
-          NetInfo.LaneType.Vehicle, info.m_vehicleType, 20000f))
-        {
-          if (vehicleData.m_path != 0U)
-            Singleton<PathManager>.instance.ReleasePath(vehicleData.m_path);
-          vehicleData.m_path = unit;
-          vehicleData.m_flags |= Vehicle.Flags.WaitingPath;
-          return true;
-        }
-      }
-
-      PathUnit.Position pathPosA3;
-      PathUnit.Position pathPosB3;
-      float distanceSqrA3;
-      PathUnit.Position pathPosA4;
-      PathUnit.Position pathPosB4;
-      float distanceSqrA4;
-      if (FindPathPosition(startPos, ItemClass.Service.Beautification, NetInfo.LaneType.Vehicle,
-            info.m_vehicleType, false, false, 64f, out pathPosA3, out pathPosB3, out distanceSqrA3, out _) &&
-          FindPathPosition(endPos, ItemClass.Service.Beautification, NetInfo.LaneType.Vehicle,
-            info.m_vehicleType, false, false, 64f, out pathPosA4, out pathPosB4, out distanceSqrA4, out _))
-      {
-        if (!startBothWays || (double) distanceSqrA3 < 10.0)
-          pathPosB3 = new PathUnit.Position();
-        if (!endBothWays || (double) distanceSqrA4 < 10.0)
-          pathPosB4 = new PathUnit.Position();
-        uint unit;
-        if (Singleton<PathManager>.instance.CreatePath(out unit, ref Singleton<SimulationManager>.instance.m_randomizer,
-          Singleton<SimulationManager>.instance.m_currentBuildIndex, pathPosA3, pathPosB3, pathPosA4, pathPosB4,
-          NetInfo.LaneType.Vehicle, info.m_vehicleType, 20000f))
-        {
-          if (vehicleData.m_path != 0U)
-            Singleton<PathManager>.instance.ReleasePath(vehicleData.m_path);
-          vehicleData.m_path = unit;
-          vehicleData.m_flags |= Vehicle.Flags.WaitingPath;
-          return true;
-        }
-
-      }
-
-      return false;
-    }
-    
-      public static bool FindPathPosition(
-    Vector3 position,
-    ItemClass.Service service,
-    NetInfo.LaneType laneType,
-    VehicleInfo.VehicleType vehicleType,
-    bool allowUnderground,
-    bool requireConnect,
-    float maxDistance,
-    out PathUnit.Position pathPosA,
-    out PathUnit.Position pathPosB,
-    out float distanceSqrA,
-    out float distanceSqrB)
-  {
-    return FindPathPosition(position, service, service, laneType, vehicleType, VehicleInfo.VehicleType.None, allowUnderground, requireConnect, maxDistance, out pathPosA, out pathPosB, out distanceSqrA, out distanceSqrB);
-  }
-
-  public static bool FindPathPosition(
-    Vector3 position,
-    ItemClass.Service service,
-    ItemClass.SubService subService,
-    ItemClass.Level level,
-    NetInfo.LaneType laneType,
-    VehicleInfo.VehicleType vehicleType,
-    bool allowUnderground,
-    bool requireConnect,
-    float maxDistance,
-    out PathUnit.Position pathPosA,
-    out PathUnit.Position pathPosB,
-    out float distanceSqrA,
-    out float distanceSqrB)
-  {
-    return FindPathPosition(position, ItemClass.Service.None, ItemClass.Service.None, service, subService, level, laneType, vehicleType, VehicleInfo.VehicleType.None, allowUnderground, requireConnect, maxDistance, out pathPosA, out pathPosB, out distanceSqrA, out distanceSqrB);
-  }
-
-
-  public static bool FindPathPosition(
-    Vector3 position,
-    ItemClass.Service service,
-    ItemClass.Service service2,
-    NetInfo.LaneType laneType,
-    VehicleInfo.VehicleType vehicleType,
-    VehicleInfo.VehicleType stopType,
-    bool allowUnderground,
-    bool requireConnect,
-    float maxDistance,
-    out PathUnit.Position pathPosA,
-    out PathUnit.Position pathPosB,
-    out float distanceSqrA,
-    out float distanceSqrB)
-  {
-    return FindPathPosition(position, service, service2, ItemClass.Service.None, ItemClass.SubService.None, ItemClass.Level.None, laneType, vehicleType, stopType, allowUnderground, requireConnect, maxDistance, out pathPosA, out pathPosB, out distanceSqrA, out distanceSqrB);
-  }
-
-  public static bool FindPathPosition(
-    Vector3 position,
-    ItemClass.Service service,
-    ItemClass.Service service2,
-    ItemClass.Service service3,
-    ItemClass.SubService subService3,
-    ItemClass.Level level3,
-    NetInfo.LaneType laneType,
-    VehicleInfo.VehicleType vehicleType,
-    VehicleInfo.VehicleType stopType,
-    bool allowUnderground,
-    bool requireConnect,
-    float maxDistance,
-    out PathUnit.Position pathPosA,
-    out PathUnit.Position pathPosB,
-    out float distanceSqrA,
-    out float distanceSqrB)
-  {
-    Bounds bounds = new Bounds(position, new Vector3(maxDistance * 2f, maxDistance * 2f, maxDistance * 2f));
-    int num1 = Mathf.Max((int) (((double) bounds.min.x - 64.0) / 64.0 + 135.0), 0);
-    int num2 = Mathf.Max((int) (((double) bounds.min.z - 64.0) / 64.0 + 135.0), 0);
-    int num3 = Mathf.Min((int) (((double) bounds.max.x + 64.0) / 64.0 + 135.0), 269);
-    int num4 = Mathf.Min((int) (((double) bounds.max.z + 64.0) / 64.0 + 135.0), 269);
-    NetManager instance = Singleton<NetManager>.instance;
-    pathPosA.m_segment = (ushort) 0;
-    pathPosA.m_lane = (byte) 0;
-    pathPosA.m_offset = (byte) 0;
-    distanceSqrA = 1E+10f;
-    pathPosB.m_segment = (ushort) 0;
-    pathPosB.m_lane = (byte) 0;
-    pathPosB.m_offset = (byte) 0;
-    distanceSqrB = 1E+10f;
-    float num5 = maxDistance * maxDistance;
-    for (int index1 = num2; index1 <= num4; ++index1)
-    {
-      for (int index2 = num1; index2 <= num3; ++index2)
-      {
-        ushort nextGridSegment = instance.m_segmentGrid[index1 * 270 + index2];
-        int num6 = 0;
-        while (nextGridSegment != (ushort) 0)
-        {
-          NetInfo info = instance.m_segments.m_buffer[(int) nextGridSegment].Info;
-          UnityEngine.Debug.LogWarning($"Trying segment {nextGridSegment} of type {info?.name}");
-          if (info != null && (info.m_class.m_service == service || info.m_class.m_service == service2 || info.m_class.m_service == service3 && info.m_class.m_subService == subService3 && info.m_class.m_level == level3) && ((instance.m_segments.m_buffer[(int) nextGridSegment].m_flags & (NetSegment.Flags.Collapsed | NetSegment.Flags.Flooded)) == NetSegment.Flags.None && (allowUnderground || !info.m_netAI.IsUnderground())))
-          {
-            UnityEngine.Debug.LogWarning($"Service works!");
-            ushort startNode = instance.m_segments.m_buffer[(int) nextGridSegment].m_startNode;
-            ushort endNode = instance.m_segments.m_buffer[(int) nextGridSegment].m_endNode;
-            Vector3 position1 = instance.m_nodes.m_buffer[(int) startNode].m_position;
-            Vector3 position2 = instance.m_nodes.m_buffer[(int) endNode].m_position;
-            float num7 = Mathf.Max(Mathf.Max(bounds.min.x - 64f - position1.x, bounds.min.z - 64f - position1.z), Mathf.Max((float) ((double) position1.x - (double) bounds.max.x - 64.0), (float) ((double) position1.z - (double) bounds.max.z - 64.0)));
-            float num8 = Mathf.Max(Mathf.Max(bounds.min.x - 64f - position2.x, bounds.min.z - 64f - position2.z), Mathf.Max((float) ((double) position2.x - (double) bounds.max.x - 64.0), (float) ((double) position2.z - (double) bounds.max.z - 64.0)));
-            Vector3 positionA;
-            int laneIndexA;
-            float laneOffsetA;
-            Vector3 positionB;
-            int laneIndexB;
-            float laneOffsetB;
-            if (((double) num7 < 0.0 || (double) num8 < 0.0) && (instance.m_segments.m_buffer[(int) nextGridSegment].m_bounds.Intersects(bounds) && instance.m_segments.m_buffer[(int) nextGridSegment].GetClosestLanePosition(position, laneType, vehicleType, stopType, requireConnect, out positionA, out laneIndexA, out laneOffsetA, out positionB, out laneIndexB, out laneOffsetB)))
-            {
-              UnityEngine.Debug.LogWarning($"A");
-              float num9 = Vector3.SqrMagnitude(position - positionA);
-              UnityEngine.Debug.LogWarning($"Evaluating position - position:{position},positionA: {positionA}, num5:{num5}, num9: {num9}");
-              if ((double) num9 < (double) num5)
-              {
-                UnityEngine.Debug.LogWarning($"B");
-                num5 = num9;
-                pathPosA.m_segment = nextGridSegment;
-                pathPosA.m_lane = (byte) laneIndexA;
-                pathPosA.m_offset = (byte) Mathf.Clamp(Mathf.RoundToInt(laneOffsetA * (float) byte.MaxValue), 0, (int) byte.MaxValue);
-                distanceSqrA = num9;
-                float num10 = Vector3.SqrMagnitude(position - positionB);
-                if (laneIndexB == -1 || (double) num10 >= (double) maxDistance * (double) maxDistance)
-                {
-                  UnityEngine.Debug.LogWarning($"C");
-                  pathPosB.m_segment = (ushort) 0;
-                  pathPosB.m_lane = (byte) 0;
-                  pathPosB.m_offset = (byte) 0;
-                  distanceSqrB = 1E+10f;
-                }
-                else
-                {
-                  UnityEngine.Debug.LogWarning($"D");
-                  pathPosB.m_segment = nextGridSegment;
-                  pathPosB.m_lane = (byte) laneIndexB;
-                  pathPosB.m_offset = (byte) Mathf.Clamp(Mathf.RoundToInt(laneOffsetB * (float) byte.MaxValue), 0, (int) byte.MaxValue);
-                  distanceSqrB = num10;
-                }
-              }
-            }
-          }
-          nextGridSegment = instance.m_segments.m_buffer[(int) nextGridSegment].m_nextGridSegment;
-          if (++num6 >= 36864)
-          {
-            CODebugBase<LogChannel>.Error(LogChannel.Core, "Invalid list detected!\n" + System.Environment.StackTrace);
-            break;
-          }
-        }
-      }
-    }
-    return pathPosA.m_segment != (ushort) 0;
-  }
   }
 }
     
