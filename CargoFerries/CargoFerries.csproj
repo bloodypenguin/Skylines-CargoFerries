@@ -39,6 +39,7 @@
     <Compile Include="Config\ShipItems.cs" />
     <Compile Include="HarmonyPatches\BuildingInfoPatch.cs" />
     <Compile Include="HarmonyPatches\CargoTruckVehicleTypePatch.cs" />
+    <Compile Include="HarmonyPatches\FerryAIDisableCollisionCheckPatch.cs" />
     <Compile Include="HarmonyPatches\VehicleInfoPatch.cs" />
     <Compile Include="ItemClasses.cs" />
     <Compile Include="Mod.cs" />
