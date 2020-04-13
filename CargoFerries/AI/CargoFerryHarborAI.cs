@@ -17,7 +17,7 @@ namespace CargoFerries.AI
         {
             var errors = base.CheckBuildPosition(relocateID, ref position, ref angle, waterHeight, elevation,
                 ref connectionSegment, out productionRate, out constructionCost);
-            return errors &= ~ToolBase.ToolErrors.CannotConnect;
+            return errors & ~ToolBase.ToolErrors.CannotConnect;
         }
     }
 }
