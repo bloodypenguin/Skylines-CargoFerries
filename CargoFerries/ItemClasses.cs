@@ -11,7 +11,7 @@ namespace CargoFerries
         {
             var createInstance = ScriptableObject.CreateInstance<ItemClass>();
             createInstance.name = name;
-            createInstance.m_level = ItemClass.Level.Level3;
+            createInstance.m_level = ItemClass.Level.Level5;
             createInstance.m_service = ItemClass.Service.PublicTransport;
             createInstance.m_subService = ItemClass.SubService.PublicTransportShip;
             return createInstance;
