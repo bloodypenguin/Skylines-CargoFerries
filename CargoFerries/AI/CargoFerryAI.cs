@@ -6,6 +6,9 @@ namespace CargoFerries.AI
 {
   public class CargoFerryAI : FerryAI
   {
+
+    private static TransportInfo _transportInfo;
+    
     [CustomizableProperty("Cargo capacity")]
     public int m_cargoCapacity = 1;
 
@@ -1139,6 +1142,33 @@ namespace CargoFerries.AI
         }
       }
       return false;
+    }
+
+    public override void SimulationStep(ushort vehicleID,
+      ref Vehicle vehicleData,
+      ref Vehicle.Frame frameData,
+      ushort leaderID,
+      ref Vehicle leaderData,
+      int lodPhysics)
+    {
+      if ((VehicleManager.instance.m_vehicles.m_buffer[vehicleID].m_flags & Vehicle.Flags.Arriving) != 0)
+      {
+        if (_transportInfo == null)
+        {
+          _transportInfo = PrefabCollection<TransportInfo>.FindLoaded("Ferry");
+        }
+        var ai = new CargoShipAI()
+        {
+          m_info = this.m_info,
+          m_transportInfo = _transportInfo,
+          m_cargoCapacity = this.m_cargoCapacity
+        };
+        ai.SimulationStep(vehicleID, ref vehicleData, ref frameData, leaderID, ref leaderData, lodPhysics);
+      }
+      else
+      {
+        base.SimulationStep(vehicleID, ref vehicleData, ref frameData, leaderID, ref leaderData, lodPhysics);
+      }
     }
   }
 }

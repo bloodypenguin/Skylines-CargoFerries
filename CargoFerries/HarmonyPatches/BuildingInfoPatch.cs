@@ -51,8 +51,6 @@ namespace CargoFerries.HarmonyPatches
                 Object.DestroyImmediate(oldAi);
                 var ai = __instance.gameObject.AddComponent<CargoFerryHarborAI>();
                 PrefabUtil.TryCopyAttributes(oldAi, ai, false);
-                typeof(CargoHarborAI).GetField("m_quayOffset", BindingFlags.Instance | BindingFlags.NonPublic)
-                    .SetValue(ai, -4f); //TODO: only patch my asset
             }
             catch (Exception e)
             {
