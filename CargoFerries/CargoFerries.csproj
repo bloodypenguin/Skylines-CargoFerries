@@ -33,7 +33,7 @@
   <ItemGroup>
     <Compile Include="AI\CargoFerryAI.cs" />
     <Compile Include="AI\CargoFerryHarborAI.cs" />
-    <Compile Include="AI\FakeCargoShipAI.cs" />
+    <Compile Include="AI\FakeFerryAI.cs" />
     <Compile Include="Config\ShipCategory.cs" />
     <Compile Include="Config\Config.cs" />
     <Compile Include="Config\ShipItem.cs" />

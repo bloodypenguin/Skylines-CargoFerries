@@ -54,8 +54,6 @@ namespace CargoFerries.HarmonyPatches
                     __instance.m_vehicleType = VehicleInfo.VehicleType.Ferry;
                     __instance.m_class = ItemClasses.cargoFerryVehicle;
                     ReplaceAI(__instance);
-                    // var oldAi = __instance.GetComponent<CargoShipAI>();
-                    // oldAi.m_transportInfo = PrefabCollection<TransportInfo>.FindLoaded("Ferry");
                 }
             }
             catch (Exception e)
@@ -73,6 +71,7 @@ namespace CargoFerries.HarmonyPatches
             var ai = __instance.gameObject.AddComponent<CargoFerryAI>();
             PrefabUtil.TryCopyAttributes(oldAi, ai, false);
             ai.m_info = __instance;
+            ai.m_transportInfo = PrefabCollection<TransportInfo>.FindLoaded("Ferry");
             __instance.m_vehicleAI = ai;
         }
     }

@@ -36,7 +36,8 @@ namespace CargoFerries.HarmonyPatches
 
         public static bool Prefix(ushort vehicleID, ref bool __result)
         {
-            if (VehicleManager.instance.m_vehicles.m_buffer[vehicleID].Info?.m_vehicleAI is CargoFerryAI)
+            var vehicleAi = VehicleManager.instance.m_vehicles.m_buffer[vehicleID].Info?.m_vehicleAI;
+            if (vehicleAi is FakeFerryAI)
             {
                 __result = false;
                 return false;
