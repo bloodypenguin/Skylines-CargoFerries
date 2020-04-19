@@ -66,19 +66,20 @@ namespace CargoFerries.HarmonyPatches
             {
                 __instance.m_vehicleType = VehicleInfo.VehicleType.Ferry;
                 __instance.m_class = ItemClasses.cargoFerryVehicle;
-                ReplaceAI(__instance);
+                var ai = ReplaceAI<CargoFerryAI>(__instance);
+                ai.m_transportInfo = PrefabCollection<TransportInfo>.FindLoaded("Ferry");
             }
         }
 
-        private static void ReplaceAI(VehicleInfo __instance)
+        private static T ReplaceAI<T>(VehicleInfo __instance) where T : VehicleAI
         {
-            var oldAi = __instance.GetComponent<CargoShipAI>();
+            var oldAi = __instance.GetComponent<VehicleAI>();
             Object.DestroyImmediate(oldAi);
-            var ai = __instance.gameObject.AddComponent<CargoFerryAI>();
+            var ai = __instance.gameObject.AddComponent<T>();
             PrefabUtil.TryCopyAttributes(oldAi, ai, false);
             ai.m_info = __instance;
-            ai.m_transportInfo = PrefabCollection<TransportInfo>.FindLoaded("Ferry");
             __instance.m_vehicleAI = ai;
+            return ai;
         }
     }
 }
