@@ -6,16 +6,16 @@ using System.Xml.Serialization;
 namespace CargoFerries.Config
 {
     [Serializable]
-    public class ShipItem
+    public class VehicleItem
     {
-        public ShipItem()
+        public VehicleItem()
         {
             Exclude = false;
             WorkshopId = -1;
             Description = string.Empty;
         }
 
-        public ShipItem(long workshoId, string description)
+        public VehicleItem(long workshoId, string description)
         {
             Exclude = false;
             Description = description;

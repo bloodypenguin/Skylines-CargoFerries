@@ -4,17 +4,20 @@ using CargoFerries.OptionsFramework.Attibutes;
 
 namespace CargoFerries.Config
 {
-    [Options("CargoFerries-Config")]
+    [Options("MoreCargoModes-Config")]
     public class Config
     {
         public Config()
         {
-            CargoShips = new ShipItems(Ships.GetItems(ShipCategory.CargoShip).OrderBy(i => i.WorkshopId).ToList());
+            CargoFerries = new VehicleItems(Ships.GetItems(VehicleCategory.CargoShip).OrderBy(i => i.WorkshopId).ToList());
+            CargoHelicopters = new VehicleItems(Ships.GetItems(VehicleCategory.CargoHelicopter).OrderBy(i => i.WorkshopId).ToList());
         }
 
         [XmlElement("version")]
         public int Version { get; set; }
         [XmlElement("cargo-ships-to-cargo-ferries")]
-        public ShipItems CargoShips { get; private set; }
+        public VehicleItems CargoFerries { get; private set; }
+        [XmlElement("helicopters-to-cargo-helicopters")]
+        public VehicleItems CargoHelicopters { get; private set; }
     }
 }

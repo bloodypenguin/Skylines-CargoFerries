@@ -43,18 +43,12 @@ namespace CargoFerries.HarmonyPatches
         {
             try
             {
-                if (!Util.TryGetWorkshopId( __instance, out long id) || !Ships.GetConvertedIds(ShipCategory.CargoShip).Contains(id))
+                if (Util.TryGetWorkshopId( __instance, out long id) && Ships.GetConvertedIds(VehicleCategory.CargoShip).Contains(id))
                 {
-                    return true;
+                    ConvertToCargoFerry(__instance);
                 }
-                if (__instance.m_class.m_subService == ItemClass.SubService.PublicTransportShip &&
-                    __instance.m_class?.m_level == ItemClass.Level.Level4 &&
-                    __instance.GetComponent<VehicleAI>() is CargoShipAI)
-                {
-                    __instance.m_vehicleType = VehicleInfo.VehicleType.Ferry;
-                    __instance.m_class = ItemClasses.cargoFerryVehicle;
-                    ReplaceAI(__instance);
-                }
+
+
             }
             catch (Exception e)
             {
@@ -62,6 +56,18 @@ namespace CargoFerries.HarmonyPatches
             }
 
             return true;
+        }
+
+        private static void ConvertToCargoFerry(VehicleInfo __instance)
+        {
+            if (__instance.m_class.m_subService == ItemClass.SubService.PublicTransportShip &&
+                __instance.m_class?.m_level == ItemClass.Level.Level4 &&
+                __instance.GetComponent<VehicleAI>() is CargoShipAI)
+            {
+                __instance.m_vehicleType = VehicleInfo.VehicleType.Ferry;
+                __instance.m_class = ItemClasses.cargoFerryVehicle;
+                ReplaceAI(__instance);
+            }
         }
 
         private static void ReplaceAI(VehicleInfo __instance)

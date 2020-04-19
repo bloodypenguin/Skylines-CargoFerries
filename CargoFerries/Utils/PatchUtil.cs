@@ -51,7 +51,7 @@ namespace CargoFerries.Utils
         private static MethodInfo GetOriginal(MethodDefinition original)
         {
             var bindingFlags = original.BindingFlags == BindingFlags.Default
-                ? BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static
+                ? BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly
                 : original.BindingFlags;
             var methodInfo = original.ArgumentTypes == null
                 ? original.Type.GetMethod(original.MethodName, bindingFlags)
@@ -68,7 +68,7 @@ namespace CargoFerries.Utils
         private static MethodInfo GetPatch(MethodDefinition patch)
         {
             var bindingFlags = patch.BindingFlags == BindingFlags.Default
-                ? BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static
+                ? BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly
                 : patch.BindingFlags;
             var methodInfo = patch.ArgumentTypes == null
                 ? patch.Type.GetMethod(patch.MethodName, bindingFlags)

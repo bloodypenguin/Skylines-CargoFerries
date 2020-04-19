@@ -3,11 +3,13 @@
 namespace CargoFerries.Config
 {
     [Flags]
-    public enum ShipCategory
+    public enum VehicleCategory
     {
         None = 0,
         CargoShip = 1,
+        CargoHelicopter = 2,
         Ships = CargoShip,
-        All = Ships
+        Helicopters = CargoHelicopter,
+        All = Ships | Helicopters
     }
 }

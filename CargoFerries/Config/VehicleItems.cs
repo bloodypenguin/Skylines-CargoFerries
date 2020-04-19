@@ -5,19 +5,19 @@ using System.Xml.Serialization;
 namespace CargoFerries.Config
 {
     [Serializable]
-    public class ShipItems
+    public class VehicleItems
     {
-        public ShipItems()
+        public VehicleItems()
         {
-            this.Items = new List<ShipItem>();
+            this.Items = new List<VehicleItem>();
         }
 
-        public ShipItems(List<ShipItem> items)
+        public VehicleItems(List<VehicleItem> items)
         {
             this.Items = items;
         }
 
         [XmlElement("items")]
-        public List<ShipItem> Items { get; private set; }
+        public List<VehicleItem> Items { get; private set; }
     }
 }

@@ -34,10 +34,10 @@
     <Compile Include="AI\CargoFerryAI.cs" />
     <Compile Include="AI\CargoFerryHarborAI.cs" />
     <Compile Include="AI\FakeFerryAI.cs" />
-    <Compile Include="Config\ShipCategory.cs" />
+    <Compile Include="Config\VehicleCategory.cs" />
     <Compile Include="Config\Config.cs" />
-    <Compile Include="Config\ShipItem.cs" />
-    <Compile Include="Config\ShipItems.cs" />
+    <Compile Include="Config\VehicleItem.cs" />
+    <Compile Include="Config\VehicleItems.cs" />
     <Compile Include="HarmonyPatches\BuildingInfoPatch.cs" />
     <Compile Include="HarmonyPatches\CargoTruckVehicleTypePatch.cs" />
     <Compile Include="HarmonyPatches\FerryAIDisableCollisionCheckPatch.cs" />

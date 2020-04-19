@@ -64,14 +64,16 @@ namespace CargoFerries.HarmonyPatches
                     newCodes.Add(codeInstruction);
                     continue;
                 }
-                var newInstuction = new CodeInstruction(OpCodes.Ldc_I4,  ((sbyte)28).Equals(codeInstruction.operand) ? ((int)1052) : ((int)1053))
+                var newInstruction = new CodeInstruction(OpCodes.Ldc_I4,  ((sbyte)28).Equals(codeInstruction.operand)
+                        ? (int)(VehicleInfo.VehicleType.Train | VehicleInfo.VehicleType.Ship | VehicleInfo.VehicleType.Plane | VehicleInfo.VehicleType.Ferry | VehicleInfo.VehicleType.Helicopter) 
+                        : (int)(VehicleInfo.VehicleType.Train | VehicleInfo.VehicleType.Ship | VehicleInfo.VehicleType.Plane | VehicleInfo.VehicleType.Ferry | VehicleInfo.VehicleType.Helicopter | VehicleInfo.VehicleType.Car))
                 {
                     labels = codeInstruction.labels
                 }
                 ;
-                newCodes.Add(newInstuction);
+                newCodes.Add(newInstruction);
                 Debug.LogWarning(
-                    $"MCM: Replaced vehicle type with {newInstuction.operand}");
+                    $"SVS2: Replaced vehicle type with {newInstruction.operand}");
             }
 
             return newCodes.AsEnumerable();
