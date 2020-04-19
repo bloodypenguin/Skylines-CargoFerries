@@ -22,12 +22,12 @@ namespace CargoFerries.Utils
             if (prefix == null && postfix == null && transpiler == null)
             {
                 throw new Exception(
-                    $"SVS2: prefix, postfix and transpiler are null for method {original.Type.FullName}.{original.MethodName}");
+                    $"MCM: prefix, postfix and transpiler are null for method {original.Type.FullName}.{original.MethodName}");
             }
 
             try
             {
-                Debug.Log($"SVS2: Patching method {original.Type.FullName}.{original.MethodName}");
+                Debug.Log($"MCM: Patching method {original.Type.FullName}.{original.MethodName}");
                 var methodInfo = GetOriginal(original);
                 HarmonyInstance.Patch(methodInfo,
                     prefix: prefix == null ? null : new HarmonyMethod(GetPatch(prefix)),
@@ -37,14 +37,14 @@ namespace CargoFerries.Utils
             }
             catch (Exception e)
             {
-                Debug.LogError($"SVS2: Failed to patch method {original.Type.FullName}.{original.MethodName}");
+                Debug.LogError($"MCM: Failed to patch method {original.Type.FullName}.{original.MethodName}");
                 Debug.LogException(e);
             }
         }
 
         public static void Unpatch(MethodDefinition original)
         {
-            Debug.Log($"SVS2: Unpatching method {original.Type.FullName}.{original.MethodName}");
+            Debug.Log($"MCM: Unpatching method {original.Type.FullName}.{original.MethodName}");
             HarmonyInstance.Unpatch(GetOriginal(original), HarmonyPatchType.All, HarmonyId);
         }
 
@@ -59,7 +59,7 @@ namespace CargoFerries.Utils
             if (methodInfo == null)
             {
                 throw new Exception(
-                    $"SVS2: Failed to find original method {original.Type.FullName}.{original.MethodName}");
+                    $"MCM: Failed to find original method {original.Type.FullName}.{original.MethodName}");
             }
 
             return methodInfo;
@@ -76,7 +76,7 @@ namespace CargoFerries.Utils
             
             if (methodInfo == null)
             {
-                throw new Exception($"SVS2: Failed to find patch method {patch.Type.FullName}.{patch.MethodName}");
+                throw new Exception($"MCM: Failed to find patch method {patch.Type.FullName}.{patch.MethodName}");
             }
 
             return methodInfo;

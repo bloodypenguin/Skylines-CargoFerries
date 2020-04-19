@@ -9,7 +9,7 @@ namespace CargoFerries
 {
     public class Mod : IUserMod
     {
-        public string Name => "Cargo Ferries";
+        public string Name => "More Cargo Modes";
         public string Description => "Adds new type of cargo transport - cargo ferries. They are like cargo ships but use ferry paths & canals";
 
         public void OnSettingsUI(UIHelperBase helper)
@@ -40,7 +40,7 @@ namespace CargoFerries
                 }
                 exceptionPanel.SetMessage(
                 "Malformed XML config",
-                "There was an error reading Cargo Ferries XML config:\n" + e.Message + "\n\nFalling back to default config...",
+                "There was an error reading More Cargo Modes XML config:\n" + e.Message + "\n\nFalling back to default config...",
                 true);
                 GameObject.Destroy(this.gameObject);
             }

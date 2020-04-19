@@ -6,7 +6,7 @@ using CargoFerries.Utils;
 using Harmony;
 using UnityEngine;
 
-namespace ServiceVehicleSelector2.HarmonyPatches
+namespace CargoFerries.HarmonyPatches
 {
     public class CargoTruckVehicleTypePatch
     {
@@ -54,7 +54,7 @@ namespace ServiceVehicleSelector2.HarmonyPatches
         private static IEnumerable<CodeInstruction> Transpile(MethodBase original,
             IEnumerable<CodeInstruction> instructions)
         {
-            Debug.Log("SVS2: Transpiling method: " + original.DeclaringType + "." + original);
+            Debug.Log("MCM: Transpiling method: " + original.DeclaringType + "." + original);
             var codes = new List<CodeInstruction>(instructions);
             var newCodes = new List<CodeInstruction>();
             foreach (var codeInstruction in codes)
@@ -71,7 +71,7 @@ namespace ServiceVehicleSelector2.HarmonyPatches
                 ;
                 newCodes.Add(newInstuction);
                 Debug.LogWarning(
-                    $"SVS2: Replaced vehicle type with {newInstuction.operand}");
+                    $"MCM: Replaced vehicle type with {newInstuction.operand}");
             }
 
             return newCodes.AsEnumerable();

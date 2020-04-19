@@ -4,7 +4,6 @@ using System.Reflection;
 using CargoFerries.HarmonyPatches;
 using ColossalFramework;
 using ICities;
-using ServiceVehicleSelector2.HarmonyPatches;
 
 namespace CargoFerries
 {
