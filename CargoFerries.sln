@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{AE9D4D71-A1BF-478A-BAE8-FCC3C8BCC253}") = "CargoFerries", "CargoFerries\CargoFerries.csproj", "{F14D8F14-F259-426C-B854-C7C0CEF55BBC}"
+Project("{AE9D4D71-A1BF-478A-BAE8-FCC3C8BCC253}") = "MoreCargoModes", "CargoFerries\MoreCargoModes.csproj", "{F14D8F14-F259-426C-B854-C7C0CEF55BBC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

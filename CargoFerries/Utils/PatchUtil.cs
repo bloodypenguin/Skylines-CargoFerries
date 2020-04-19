@@ -7,7 +7,7 @@ namespace CargoFerries.Utils
 {
     public static class PatchUtil
     {
-        private const string HarmonyId = "github.com/bloodypenguin/Skylines-CargoFerries";
+        private const string HarmonyId = "github.com/bloodypenguin/Skylines-MoreCargoModes";
         private static HarmonyInstance _harmonyInstance = null;
 
         private static HarmonyInstance HarmonyInstance =>
