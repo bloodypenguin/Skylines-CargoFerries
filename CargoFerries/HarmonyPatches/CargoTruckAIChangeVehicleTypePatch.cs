@@ -66,12 +66,18 @@ namespace CargoFerries.HarmonyPatches
             ItemClass.Service service, ItemClass.SubService subService, ItemClass.Level level)
         {
             var infoFrom = BuildingManager.instance.m_buildings.m_buffer[cargoStation1].Info;
-            if (infoFrom?.m_class?.name == "Ferry Cargo Facility") //to support Cargo Ferries
+            if (infoFrom?.m_class?.name == ItemClasses.cargoFerryFacility.name) //to support Cargo Ferries
             {
                 level = ItemClass.Level.Level5;
             }
-            return instance.GetRandomVehicleInfo(
+
+            var vehicleInfo = instance.GetRandomVehicleInfo(
                 ref Singleton<SimulationManager>.instance.m_randomizer, service, subService, level);
+            if (vehicleInfo == null && infoFrom?.m_class?.name == ItemClasses.cargoFerryFacility.name)
+            {
+                UnityEngine.Debug.LogWarning("No Cargo Ferries found!");
+            }
+            return vehicleInfo;
         }
     }
 }

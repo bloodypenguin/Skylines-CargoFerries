@@ -12,25 +12,16 @@ namespace CargoFerries
         public override void OnCreated(ILoading loading)
         {
             base.OnCreated(loading);
-            var dictionary = ((Dictionary<string, ItemClass>)typeof(ItemClassCollection).GetField("m_classDict", BindingFlags.Static | BindingFlags.NonPublic).GetValue(null));
-            if (!dictionary.ContainsKey(ItemClasses.cargoFerryFacility.name))
-            {
-                dictionary.Add(ItemClasses.cargoFerryFacility.name, ItemClasses.cargoFerryFacility);
-            }
-            if (!dictionary.ContainsKey(ItemClasses.cargoFerryVehicle.name))
-            {
-                dictionary.Add(ItemClasses.cargoFerryVehicle.name, ItemClasses.cargoFerryVehicle);
-            }
+            ItemClasses.Register();
             if (loading.currentMode != AppMode.Game)
             {
                 return;
             }
-            
             VehicleInfoPatch.Apply();
             CargoTruckVehicleTypePatch.Apply();
             BuildingInfoPatch.Apply();
             FerryAIDisableCollisionCheckPatch.Apply();
-            CargoTruckAIChangeVehicleTypePatch.Apply();
+            CargoTruckAIChangeVehicleTypePatch.Apply(); //TODO: check SVS2 is not enabled
         }
 
         private static void ReleaseWrongVehicles()
@@ -94,9 +85,7 @@ namespace CargoFerries
             BuildingInfoPatch.Undo();
             FerryAIDisableCollisionCheckPatch.Undo();
             CargoTruckAIChangeVehicleTypePatch.Undo();
-            var dictionary = ((Dictionary<string, ItemClass>)typeof(ItemClassCollection).GetField("m_classDict", BindingFlags.Static | BindingFlags.NonPublic).GetValue(null));
-            dictionary.Remove(ItemClasses.cargoFerryFacility.name);
-            dictionary.Remove(ItemClasses.cargoFerryVehicle.name);
+            ItemClasses.Unregister();
         }
     }
 }
