@@ -43,7 +43,7 @@ namespace CargoFerries.HarmonyPatches
         {
             try
             {
-                if (Util.TryGetWorkshopId( __instance, out long id) && Ships.GetConvertedIds(VehicleCategory.CargoShip).Contains(id))
+                if (Util.TryGetWorkshopId( __instance, out long id) && Vehicles.GetConvertedIds(VehicleCategory.CargoShip).Contains(id))
                 {
                     ConvertToCargoFerry(__instance);
                 }

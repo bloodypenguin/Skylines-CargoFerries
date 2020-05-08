@@ -5,6 +5,7 @@ namespace CargoFerries.AI
 {
     public class CargoFerryHarborAI : CargoHarborAI
     {
+        //disables checking for CannotConnect error
         public override ToolBase.ToolErrors CheckBuildPosition(
             ushort relocateID,
             ref Vector3 position,

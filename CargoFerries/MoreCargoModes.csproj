@@ -39,6 +39,7 @@
     <Compile Include="Config\VehicleItem.cs" />
     <Compile Include="Config\VehicleItems.cs" />
     <Compile Include="HarmonyPatches\BuildingInfoPatch.cs" />
+    <Compile Include="HarmonyPatches\CargoTruckAIChangeVehicleTypePatch.cs" />
     <Compile Include="HarmonyPatches\CargoTruckVehicleTypePatch.cs" />
     <Compile Include="HarmonyPatches\FerryAIDisableCollisionCheckPatch.cs" />
     <Compile Include="HarmonyPatches\VehicleInfoPatch.cs" />
@@ -57,7 +58,7 @@
     <Compile Include="OptionsFramework\OptionsWrapper.cs" />
     <Compile Include="OptionsFramework\Util.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Config\Ships.cs" />
+    <Compile Include="Config\Vehicles.cs" />
     <Compile Include="Tuple.cs" />
     <Compile Include="Utils\PatchUtil.cs" />
     <Compile Include="Utils\PrefabUtil.cs" />

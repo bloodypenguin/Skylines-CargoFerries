@@ -6,7 +6,7 @@ using CargoFerries.OptionsFramework;
 
 namespace CargoFerries.Config
 {
-    public static class Ships
+    public static class Vehicles
     {
         private static readonly Dictionary<VehicleCategory, VehicleItem[]> _ids = new Dictionary<VehicleCategory, VehicleItem[]>
         {

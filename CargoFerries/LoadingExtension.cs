@@ -30,6 +30,7 @@ namespace CargoFerries
             CargoTruckVehicleTypePatch.Apply();
             BuildingInfoPatch.Apply();
             FerryAIDisableCollisionCheckPatch.Apply();
+            CargoTruckAIChangeVehicleTypePatch.Apply();
         }
 
         private static void ReleaseWrongVehicles()
@@ -92,6 +93,7 @@ namespace CargoFerries
             CargoTruckVehicleTypePatch.Undo();
             BuildingInfoPatch.Undo();
             FerryAIDisableCollisionCheckPatch.Undo();
+            CargoTruckAIChangeVehicleTypePatch.Undo();
             var dictionary = ((Dictionary<string, ItemClass>)typeof(ItemClassCollection).GetField("m_classDict", BindingFlags.Static | BindingFlags.NonPublic).GetValue(null));
             dictionary.Remove(ItemClasses.cargoFerryFacility.name);
             dictionary.Remove(ItemClasses.cargoFerryVehicle.name);

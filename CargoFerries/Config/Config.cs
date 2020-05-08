@@ -9,8 +9,8 @@ namespace CargoFerries.Config
     {
         public Config()
         {
-            CargoFerries = new VehicleItems(Ships.GetItems(VehicleCategory.CargoShip).OrderBy(i => i.WorkshopId).ToList());
-            CargoHelicopters = new VehicleItems(Ships.GetItems(VehicleCategory.CargoHelicopter).OrderBy(i => i.WorkshopId).ToList());
+            CargoFerries = new VehicleItems(Vehicles.GetItems(VehicleCategory.CargoShip).OrderBy(i => i.WorkshopId).ToList());
+            CargoHelicopters = new VehicleItems(Vehicles.GetItems(VehicleCategory.CargoHelicopter).OrderBy(i => i.WorkshopId).ToList());
         }
 
         [XmlElement("version")]
