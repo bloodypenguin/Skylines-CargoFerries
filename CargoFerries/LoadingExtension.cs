@@ -17,11 +17,16 @@ namespace CargoFerries
             {
                 return;
             }
+            FerryAIPatch.Apply();
             VehicleInfoPatch.Apply();
             CargoTruckVehicleTypePatch.Apply();
             BuildingInfoPatch.Apply();
-            FerryAIDisableCollisionCheckPatch.Apply();
-            CargoTruckAIChangeVehicleTypePatch.Apply(); //TODO: check SVS2 is not enabled
+            if (Util.IsModActive("Service Vehicle Selector 2"))
+            {
+                UnityEngine.Debug.Log("MCM: Service Vehicle Selector 2 is detected! CargoTruckAI.ChangeVehicleType() won't be patched");
+            } else {
+                CargoTruckAIChangeVehicleTypePatch.Apply(); 
+            }
         }
 
         private static void ReleaseWrongVehicles()
@@ -83,8 +88,8 @@ namespace CargoFerries
             VehicleInfoPatch.Undo();
             CargoTruckVehicleTypePatch.Undo();
             BuildingInfoPatch.Undo();
-            FerryAIDisableCollisionCheckPatch.Undo();
             CargoTruckAIChangeVehicleTypePatch.Undo();
+            FerryAIPatch.Undo();
             ItemClasses.Unregister();
         }
     }

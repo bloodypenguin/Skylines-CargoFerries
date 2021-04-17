@@ -33,7 +33,6 @@
   <ItemGroup>
     <Compile Include="AI\CargoFerryAI.cs" />
     <Compile Include="AI\CargoFerryHarborAI.cs" />
-    <Compile Include="AI\FakeFerryAI.cs" />
     <Compile Include="Config\VehicleCategory.cs" />
     <Compile Include="Config\Config.cs" />
     <Compile Include="Config\VehicleItem.cs" />
@@ -41,7 +40,7 @@
     <Compile Include="HarmonyPatches\BuildingInfoPatch.cs" />
     <Compile Include="HarmonyPatches\CargoTruckAIChangeVehicleTypePatch.cs" />
     <Compile Include="HarmonyPatches\CargoTruckVehicleTypePatch.cs" />
-    <Compile Include="HarmonyPatches\FerryAIDisableCollisionCheckPatch.cs" />
+    <Compile Include="HarmonyPatches\FerryAIPatch.cs" />
     <Compile Include="HarmonyPatches\VehicleInfoPatch.cs" />
     <Compile Include="ItemClasses.cs" />
     <Compile Include="Mod.cs" />
