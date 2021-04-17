@@ -274,7 +274,10 @@ public class CargoFerryAI : VehicleAI
         }
 
         int num1 = ItemClass.GetPrivateServiceIndex(this.m_info.m_class.m_service) == -1 ? 150 : 100;
-        if ((data.m_flags & (Vehicle.Flags.Spawned | Vehicle.Flags.WaitingPath | Vehicle.Flags.WaitingSpace)) ==
+        //added WaitingCargo
+        if (
+            (data.m_flags & (Vehicle.Flags.Spawned | Vehicle.Flags.WaitingPath | Vehicle.Flags.WaitingSpace |
+                             Vehicle.Flags.WaitingCargo)) ==
             ~(Vehicle.Flags.Created | Vehicle.Flags.Deleted | Vehicle.Flags.Spawned | Vehicle.Flags.Inverted |
               Vehicle.Flags.TransferToTarget | Vehicle.Flags.TransferToSource | Vehicle.Flags.Emergency1 |
               Vehicle.Flags.Emergency2 | Vehicle.Flags.WaitingPath | Vehicle.Flags.Stopped | Vehicle.Flags.Leaving |
