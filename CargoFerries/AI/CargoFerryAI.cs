@@ -4,14 +4,9 @@ using System;
 using UnityEngine;
 
 //based of FerryAI + parts from CargoShipAI
-public class CargoFerryAI : VehicleAI
+public class CargoFerryAI : CargoShipAI
 {
     [NonSerialized] private RenderGroup.MeshData m_underwaterMeshData;
-
-    [CustomizableProperty("Cargo capacity")]
-    public int m_cargoCapacity = 1;
-
-    public TransportInfo m_transportInfo;
 
     public override Matrix4x4 CalculateBodyMatrix(
         Vehicle.Flags flags,
@@ -315,198 +310,867 @@ public class CargoFerryAI : VehicleAI
         ref Vehicle leaderData,
         int lodPhysics)
     {
-        uint currentFrameIndex = Singleton<SimulationManager>.instance.m_currentFrameIndex;
-        frameData.m_position += frameData.m_velocity * 0.5f;
-        frameData.m_swayPosition += frameData.m_swayVelocity * 0.5f;
-        float acceleration = this.m_info.m_acceleration;
-        float braking = this.m_info.m_braking;
-        float num1 = VectorUtils.LengthXZ(frameData.m_velocity);
-        Vector3 v1 = (Vector3) vehicleData.m_targetPos0 - frameData.m_position;
-        float f1 = VectorUtils.LengthSqrXZ(v1);
-        float maxDistance =
-            (float) (((double) num1 + (double) acceleration) *
-                     (0.5 + 0.5 * ((double) num1 + (double) acceleration) / (double) braking) +
-                     (double) this.m_info.m_generatedInfo.m_size.z * 0.5);
-        float num2 = Mathf.Max(num1 + acceleration, 5f);
-        if (lodPhysics >= 2 && (long) (currentFrameIndex >> 4 & 3U) == (long) ((int) vehicleID & 3))
-            num2 *= 2f;
-        float num3 = Mathf.Max((float) (((double) maxDistance - (double) num2) / 3.0), 1f);
-        float minSqrDistanceA = num2 * num2;
-        float minSqrDistanceB = num3 * num3;
-        int index = 0;
-        bool flag1 = false;
-        if (((double) f1 < (double) minSqrDistanceA || (double) vehicleData.m_targetPos3.w < 0.00999999977648258) &&
-            (leaderData.m_flags & (Vehicle.Flags.WaitingPath | Vehicle.Flags.Stopped)) == ~(Vehicle.Flags.Created |
-                Vehicle.Flags.Deleted | Vehicle.Flags.Spawned | Vehicle.Flags.Inverted |
-                Vehicle.Flags.TransferToTarget | Vehicle.Flags.TransferToSource | Vehicle.Flags.Emergency1 |
-                Vehicle.Flags.Emergency2 | Vehicle.Flags.WaitingPath | Vehicle.Flags.Stopped | Vehicle.Flags.Leaving |
-                Vehicle.Flags.Arriving | Vehicle.Flags.Reversed | Vehicle.Flags.TakingOff | Vehicle.Flags.Flying |
-                Vehicle.Flags.Landing | Vehicle.Flags.WaitingSpace | Vehicle.Flags.WaitingCargo |
-                Vehicle.Flags.GoingBack | Vehicle.Flags.WaitingTarget | Vehicle.Flags.Importing |
-                Vehicle.Flags.Exporting | Vehicle.Flags.Parking | Vehicle.Flags.CustomName | Vehicle.Flags.OnGravel |
-                Vehicle.Flags.WaitingLoading | Vehicle.Flags.Congestion | Vehicle.Flags.DummyTraffic |
-                Vehicle.Flags.Underground | Vehicle.Flags.Transition | Vehicle.Flags.InsideBuilding |
-                Vehicle.Flags.LeftHandDrive))
+        if ((VehicleManager.instance.m_vehicles.m_buffer[vehicleID].m_flags & Vehicle.Flags.Arriving) ==
+            ~(Vehicle.Flags.Created | Vehicle.Flags.Deleted | Vehicle.Flags.Spawned | Vehicle.Flags.Inverted |
+              Vehicle.Flags.TransferToTarget | Vehicle.Flags.TransferToSource | Vehicle.Flags.Emergency1 |
+              Vehicle.Flags.Emergency2 | Vehicle.Flags.WaitingPath | Vehicle.Flags.Stopped | Vehicle.Flags.Leaving |
+              Vehicle.Flags.Arriving | Vehicle.Flags.Reversed | Vehicle.Flags.TakingOff | Vehicle.Flags.Flying |
+              Vehicle.Flags.Landing | Vehicle.Flags.WaitingSpace | Vehicle.Flags.WaitingCargo |
+              Vehicle.Flags.GoingBack | Vehicle.Flags.WaitingTarget | Vehicle.Flags.Importing |
+              Vehicle.Flags.Exporting | Vehicle.Flags.Parking | Vehicle.Flags.CustomName | Vehicle.Flags.OnGravel |
+              Vehicle.Flags.WaitingLoading | Vehicle.Flags.Congestion | Vehicle.Flags.DummyTraffic |
+              Vehicle.Flags.Underground | Vehicle.Flags.Transition | Vehicle.Flags.InsideBuilding |
+              Vehicle.Flags.LeftHandDrive))
         {
+            //if true, go to the FerryAI code, if false to ShipAI code
+            uint currentFrameIndex = Singleton<SimulationManager>.instance.m_currentFrameIndex;
+            frameData.m_position += frameData.m_velocity * 0.5f;
+            frameData.m_swayPosition += frameData.m_swayVelocity * 0.5f;
+            float acceleration = this.m_info.m_acceleration;
+            float braking = this.m_info.m_braking;
+            float num1 = VectorUtils.LengthXZ(frameData.m_velocity);
+            Vector3 v1 = (Vector3) vehicleData.m_targetPos0 - frameData.m_position;
+            float f1 = VectorUtils.LengthSqrXZ(v1);
+            float maxDistance =
+                (float) (((double) num1 + (double) acceleration) *
+                         (0.5 + 0.5 * ((double) num1 + (double) acceleration) / (double) braking) +
+                         (double) this.m_info.m_generatedInfo.m_size.z * 0.5);
+            float num2 = Mathf.Max(num1 + acceleration, 5f);
+            if (lodPhysics >= 2 && (long) (currentFrameIndex >> 4 & 3U) == (long) ((int) vehicleID & 3))
+                num2 *= 2f;
+            float num3 = Mathf.Max((float) (((double) maxDistance - (double) num2) / 3.0), 1f);
+            float minSqrDistanceA = num2 * num2;
+            float minSqrDistanceB = num3 * num3;
+            int index = 0;
+            bool flag1 = false;
+            if (((double) f1 < (double) minSqrDistanceA || (double) vehicleData.m_targetPos3.w < 0.00999999977648258) &&
+                (leaderData.m_flags & (Vehicle.Flags.WaitingPath | Vehicle.Flags.Stopped)) == ~(Vehicle.Flags.Created |
+                    Vehicle.Flags.Deleted | Vehicle.Flags.Spawned | Vehicle.Flags.Inverted |
+                    Vehicle.Flags.TransferToTarget | Vehicle.Flags.TransferToSource | Vehicle.Flags.Emergency1 |
+                    Vehicle.Flags.Emergency2 | Vehicle.Flags.WaitingPath | Vehicle.Flags.Stopped |
+                    Vehicle.Flags.Leaving |
+                    Vehicle.Flags.Arriving | Vehicle.Flags.Reversed | Vehicle.Flags.TakingOff | Vehicle.Flags.Flying |
+                    Vehicle.Flags.Landing | Vehicle.Flags.WaitingSpace | Vehicle.Flags.WaitingCargo |
+                    Vehicle.Flags.GoingBack | Vehicle.Flags.WaitingTarget | Vehicle.Flags.Importing |
+                    Vehicle.Flags.Exporting | Vehicle.Flags.Parking | Vehicle.Flags.CustomName |
+                    Vehicle.Flags.OnGravel |
+                    Vehicle.Flags.WaitingLoading | Vehicle.Flags.Congestion | Vehicle.Flags.DummyTraffic |
+                    Vehicle.Flags.Underground | Vehicle.Flags.Transition | Vehicle.Flags.InsideBuilding |
+                    Vehicle.Flags.LeftHandDrive))
+            {
+                if (leaderData.m_path != 0U)
+                {
+                    this.UpdatePathTargetPositions(vehicleID, ref vehicleData, frameData.m_position, ref index, 4,
+                        minSqrDistanceA, minSqrDistanceB);
+                    if ((leaderData.m_flags & Vehicle.Flags.Spawned) ==
+                        ~(Vehicle.Flags.Created | Vehicle.Flags.Deleted |
+                          Vehicle.Flags.Spawned | Vehicle.Flags.Inverted |
+                          Vehicle.Flags.TransferToTarget |
+                          Vehicle.Flags.TransferToSource |
+                          Vehicle.Flags.Emergency1 |
+                          Vehicle.Flags.Emergency2 |
+                          Vehicle.Flags.WaitingPath |
+                          Vehicle.Flags.Stopped | Vehicle.Flags.Leaving |
+                          Vehicle.Flags.Arriving | Vehicle.Flags.Reversed |
+                          Vehicle.Flags.TakingOff | Vehicle.Flags.Flying |
+                          Vehicle.Flags.Landing |
+                          Vehicle.Flags.WaitingSpace |
+                          Vehicle.Flags.WaitingCargo |
+                          Vehicle.Flags.GoingBack |
+                          Vehicle.Flags.WaitingTarget |
+                          Vehicle.Flags.Importing |
+                          Vehicle.Flags.Exporting | Vehicle.Flags.Parking |
+                          Vehicle.Flags.CustomName |
+                          Vehicle.Flags.OnGravel |
+                          Vehicle.Flags.WaitingLoading |
+                          Vehicle.Flags.Congestion |
+                          Vehicle.Flags.DummyTraffic |
+                          Vehicle.Flags.Underground |
+                          Vehicle.Flags.Transition |
+                          Vehicle.Flags.InsideBuilding |
+                          Vehicle.Flags.LeftHandDrive))
+                    {
+                        frameData = vehicleData.m_frame0;
+                        return;
+                    }
+                }
+
+                if ((leaderData.m_flags & Vehicle.Flags.WaitingPath) ==
+                    ~(Vehicle.Flags.Created | Vehicle.Flags.Deleted |
+                      Vehicle.Flags.Spawned | Vehicle.Flags.Inverted |
+                      Vehicle.Flags.TransferToTarget |
+                      Vehicle.Flags.TransferToSource |
+                      Vehicle.Flags.Emergency1 |
+                      Vehicle.Flags.Emergency2 |
+                      Vehicle.Flags.WaitingPath |
+                      Vehicle.Flags.Stopped | Vehicle.Flags.Leaving |
+                      Vehicle.Flags.Arriving | Vehicle.Flags.Reversed |
+                      Vehicle.Flags.TakingOff | Vehicle.Flags.Flying |
+                      Vehicle.Flags.Landing |
+                      Vehicle.Flags.WaitingSpace |
+                      Vehicle.Flags.WaitingCargo |
+                      Vehicle.Flags.GoingBack |
+                      Vehicle.Flags.WaitingTarget |
+                      Vehicle.Flags.Importing |
+                      Vehicle.Flags.Exporting | Vehicle.Flags.Parking |
+                      Vehicle.Flags.CustomName |
+                      Vehicle.Flags.OnGravel |
+                      Vehicle.Flags.WaitingLoading |
+                      Vehicle.Flags.Congestion |
+                      Vehicle.Flags.DummyTraffic |
+                      Vehicle.Flags.Underground |
+                      Vehicle.Flags.Transition |
+                      Vehicle.Flags.InsideBuilding |
+                      Vehicle.Flags.LeftHandDrive))
+                {
+                    while (index < 4)
+                    {
+                        float minSqrDistance;
+                        Vector3 refPos;
+                        if (index == 0)
+                        {
+                            minSqrDistance = minSqrDistanceA;
+                            refPos = frameData.m_position;
+                            flag1 = true;
+                        }
+                        else
+                        {
+                            minSqrDistance = minSqrDistanceB;
+                            refPos = (Vector3) vehicleData.GetTargetPos(index - 1);
+                        }
+
+                        int num4 = index;
+                        this.UpdateBuildingTargetPositions(vehicleID, ref vehicleData, refPos, leaderID, ref leaderData,
+                            ref index, minSqrDistance);
+                        if (index == num4)
+                            break;
+                    }
+
+                    if (index != 0)
+                    {
+                        Vector4 targetPos = vehicleData.GetTargetPos(index - 1);
+                        while (index < 4)
+                            vehicleData.SetTargetPos(index++, targetPos);
+                    }
+                }
+
+                v1 = (Vector3) vehicleData.m_targetPos0 - frameData.m_position;
+                f1 = VectorUtils.LengthSqrXZ(v1);
+            }
+
             if (leaderData.m_path != 0U)
             {
-                this.UpdatePathTargetPositions(vehicleID, ref vehicleData, frameData.m_position, ref index, 4,
-                    minSqrDistanceA, minSqrDistanceB);
-                if ((leaderData.m_flags & Vehicle.Flags.Spawned) == ~(Vehicle.Flags.Created | Vehicle.Flags.Deleted |
-                                                                      Vehicle.Flags.Spawned | Vehicle.Flags.Inverted |
-                                                                      Vehicle.Flags.TransferToTarget |
-                                                                      Vehicle.Flags.TransferToSource |
-                                                                      Vehicle.Flags.Emergency1 |
-                                                                      Vehicle.Flags.Emergency2 |
-                                                                      Vehicle.Flags.WaitingPath |
-                                                                      Vehicle.Flags.Stopped | Vehicle.Flags.Leaving |
-                                                                      Vehicle.Flags.Arriving | Vehicle.Flags.Reversed |
-                                                                      Vehicle.Flags.TakingOff | Vehicle.Flags.Flying |
-                                                                      Vehicle.Flags.Landing |
-                                                                      Vehicle.Flags.WaitingSpace |
-                                                                      Vehicle.Flags.WaitingCargo |
-                                                                      Vehicle.Flags.GoingBack |
-                                                                      Vehicle.Flags.WaitingTarget |
-                                                                      Vehicle.Flags.Importing |
-                                                                      Vehicle.Flags.Exporting | Vehicle.Flags.Parking |
-                                                                      Vehicle.Flags.CustomName |
-                                                                      Vehicle.Flags.OnGravel |
-                                                                      Vehicle.Flags.WaitingLoading |
-                                                                      Vehicle.Flags.Congestion |
-                                                                      Vehicle.Flags.DummyTraffic |
-                                                                      Vehicle.Flags.Underground |
-                                                                      Vehicle.Flags.Transition |
-                                                                      Vehicle.Flags.InsideBuilding |
-                                                                      Vehicle.Flags.LeftHandDrive))
+                NetManager instance1 = Singleton<NetManager>.instance;
+                byte num4 = leaderData.m_pathPositionIndex;
+                byte lastPathOffset = leaderData.m_lastPathOffset;
+                if (num4 == byte.MaxValue)
+                    num4 = (byte) 0;
+                PathManager instance2 = Singleton<PathManager>.instance;
+                PathUnit.Position position;
+                if (instance2.m_pathUnits.m_buffer[leaderData.m_path].GetPosition((int) num4 >> 1, out position))
                 {
-                    frameData = vehicleData.m_frame0;
-                    return;
+                    instance1.m_segments.m_buffer[(int) position.m_segment]
+                        .AddTraffic(Mathf.RoundToInt(this.m_info.m_generatedInfo.m_size.z * 3f), this.GetNoiseLevel());
+                    if (((int) num4 & 1) == 0 || lastPathOffset == (byte) 0 ||
+                        (leaderData.m_flags & Vehicle.Flags.WaitingPath) != ~(Vehicle.Flags.Created |
+                                                                              Vehicle.Flags.Deleted |
+                                                                              Vehicle.Flags.Spawned |
+                                                                              Vehicle.Flags.Inverted |
+                                                                              Vehicle.Flags.TransferToTarget |
+                                                                              Vehicle.Flags.TransferToSource |
+                                                                              Vehicle.Flags.Emergency1 |
+                                                                              Vehicle.Flags.Emergency2 |
+                                                                              Vehicle.Flags.WaitingPath |
+                                                                              Vehicle.Flags.Stopped |
+                                                                              Vehicle.Flags.Leaving |
+                                                                              Vehicle.Flags.Arriving |
+                                                                              Vehicle.Flags.Reversed |
+                                                                              Vehicle.Flags.TakingOff |
+                                                                              Vehicle.Flags.Flying |
+                                                                              Vehicle.Flags.Landing |
+                                                                              Vehicle.Flags.WaitingSpace |
+                                                                              Vehicle.Flags.WaitingCargo |
+                                                                              Vehicle.Flags.GoingBack |
+                                                                              Vehicle.Flags.WaitingTarget |
+                                                                              Vehicle.Flags.Importing |
+                                                                              Vehicle.Flags.Exporting |
+                                                                              Vehicle.Flags.Parking |
+                                                                              Vehicle.Flags.CustomName |
+                                                                              Vehicle.Flags.OnGravel |
+                                                                              Vehicle.Flags.WaitingLoading |
+                                                                              Vehicle.Flags.Congestion |
+                                                                              Vehicle.Flags.DummyTraffic |
+                                                                              Vehicle.Flags.Underground |
+                                                                              Vehicle.Flags.Transition |
+                                                                              Vehicle.Flags.InsideBuilding |
+                                                                              Vehicle.Flags.LeftHandDrive))
+                    {
+                        uint laneId = PathManager.GetLaneID(position);
+                        if (laneId != 0U)
+                            instance1.m_lanes.m_buffer[laneId].ReserveSpace(this.m_info.m_generatedInfo.m_size.z);
+                    }
+                    else if (instance2.m_pathUnits.m_buffer[leaderData.m_path]
+                        .GetNextPosition((int) num4 >> 1, out position))
+                    {
+                        uint laneId = PathManager.GetLaneID(position);
+                        if (laneId != 0U)
+                            instance1.m_lanes.m_buffer[laneId].ReserveSpace(this.m_info.m_generatedInfo.m_size.z);
+                    }
                 }
             }
 
-            if ((leaderData.m_flags & Vehicle.Flags.WaitingPath) == ~(Vehicle.Flags.Created | Vehicle.Flags.Deleted |
-                                                                      Vehicle.Flags.Spawned | Vehicle.Flags.Inverted |
-                                                                      Vehicle.Flags.TransferToTarget |
-                                                                      Vehicle.Flags.TransferToSource |
-                                                                      Vehicle.Flags.Emergency1 |
-                                                                      Vehicle.Flags.Emergency2 |
-                                                                      Vehicle.Flags.WaitingPath |
-                                                                      Vehicle.Flags.Stopped | Vehicle.Flags.Leaving |
-                                                                      Vehicle.Flags.Arriving | Vehicle.Flags.Reversed |
-                                                                      Vehicle.Flags.TakingOff | Vehicle.Flags.Flying |
-                                                                      Vehicle.Flags.Landing |
-                                                                      Vehicle.Flags.WaitingSpace |
-                                                                      Vehicle.Flags.WaitingCargo |
-                                                                      Vehicle.Flags.GoingBack |
-                                                                      Vehicle.Flags.WaitingTarget |
-                                                                      Vehicle.Flags.Importing |
-                                                                      Vehicle.Flags.Exporting | Vehicle.Flags.Parking |
-                                                                      Vehicle.Flags.CustomName |
-                                                                      Vehicle.Flags.OnGravel |
-                                                                      Vehicle.Flags.WaitingLoading |
-                                                                      Vehicle.Flags.Congestion |
-                                                                      Vehicle.Flags.DummyTraffic |
-                                                                      Vehicle.Flags.Underground |
-                                                                      Vehicle.Flags.Transition |
-                                                                      Vehicle.Flags.InsideBuilding |
-                                                                      Vehicle.Flags.LeftHandDrive))
+            float maxSpeed = (leaderData.m_flags & Vehicle.Flags.Stopped) != ~(Vehicle.Flags.Created |
+                                                                               Vehicle.Flags.Deleted |
+                                                                               Vehicle.Flags.Spawned |
+                                                                               Vehicle.Flags.Inverted |
+                                                                               Vehicle.Flags.TransferToTarget |
+                                                                               Vehicle.Flags.TransferToSource |
+                                                                               Vehicle.Flags.Emergency1 |
+                                                                               Vehicle.Flags.Emergency2 |
+                                                                               Vehicle.Flags.WaitingPath |
+                                                                               Vehicle.Flags.Stopped |
+                                                                               Vehicle.Flags.Leaving |
+                                                                               Vehicle.Flags.Arriving |
+                                                                               Vehicle.Flags.Reversed |
+                                                                               Vehicle.Flags.TakingOff |
+                                                                               Vehicle.Flags.Flying |
+                                                                               Vehicle.Flags.Landing |
+                                                                               Vehicle.Flags.WaitingSpace |
+                                                                               Vehicle.Flags.WaitingCargo |
+                                                                               Vehicle.Flags.GoingBack |
+                                                                               Vehicle.Flags.WaitingTarget |
+                                                                               Vehicle.Flags.Importing |
+                                                                               Vehicle.Flags.Exporting |
+                                                                               Vehicle.Flags.Parking |
+                                                                               Vehicle.Flags.CustomName |
+                                                                               Vehicle.Flags.OnGravel |
+                                                                               Vehicle.Flags.WaitingLoading |
+                                                                               Vehicle.Flags.Congestion |
+                                                                               Vehicle.Flags.DummyTraffic |
+                                                                               Vehicle.Flags.Underground |
+                                                                               Vehicle.Flags.Transition |
+                                                                               Vehicle.Flags.InsideBuilding |
+                                                                               Vehicle.Flags.LeftHandDrive) ||
+                             (leaderData.m_flags2 & Vehicle.Flags2.Floating) == (Vehicle.Flags2) 0
+                ? 0.0f
+                : vehicleData.m_targetPos0.w;
+            Quaternion quaternion = Quaternion.Inverse(frameData.m_rotation);
+            Vector3 v2 = quaternion * v1;
+            Vector3 vector3_1 = quaternion * frameData.m_velocity;
+            Vector3 vector3_2 = Vector3.forward;
+            Vector3 zero1 = Vector3.zero;
+            Vector3 zero2 = Vector3.zero;
+            float f2 = 0.0f;
+            float num5 = 0.0f;
+            bool blocked = false;
+            float len1 = 0.0f;
+            if ((double) f1 > 1.0)
             {
-                while (index < 4)
+                vector3_2 = VectorUtils.NormalizeXZ(v2, out len1);
+                if ((double) len1 > 1.0)
                 {
-                    float minSqrDistance;
-                    Vector3 refPos;
-                    if (index == 0)
+                    Vector3 v3 = v2;
+                    float num4 = Mathf.Max(num1, 2f);
+                    float num6 = num4 * num4;
+                    if ((double) f1 > (double) num6)
+                        v3 *= num4 / Mathf.Sqrt(f1);
+                    float len2;
+                    vector3_2 = VectorUtils.NormalizeXZ(v3, out len2);
+                    len1 = Mathf.Min(len1, len2);
+                    float curve = (float) (1.57079637050629 * (1.0 - (double) vector3_2.z));
+                    if ((double) len1 > 1.0)
+                        curve /= len1;
+                    float targetDistance1 = len1;
+                    float a1 = (double) vehicleData.m_targetPos0.w >= 0.100000001490116
+                        ? Mathf.Min(
+                            Mathf.Min(maxSpeed, this.CalculateTargetSpeed(vehicleID, ref vehicleData, 1000f, curve)),
+                            CargoFerryAI.CalculateMaxSpeed(targetDistance1, vehicleData.m_targetPos1.w, braking * 0.9f))
+                        : Mathf.Min(this.CalculateTargetSpeed(vehicleID, ref vehicleData, 1000f, curve),
+                            CargoFerryAI.CalculateMaxSpeed(targetDistance1,
+                                Mathf.Min(vehicleData.m_targetPos0.w, vehicleData.m_targetPos1.w), braking * 0.9f));
+                    float targetDistance2 = targetDistance1 +
+                                            VectorUtils.LengthXZ((Vector3) (vehicleData.m_targetPos1 -
+                                                                            vehicleData.m_targetPos0));
+                    float a2 = Mathf.Min(a1,
+                        CargoFerryAI.CalculateMaxSpeed(targetDistance2, vehicleData.m_targetPos2.w, braking * 0.9f));
+                    float targetDistance3 = targetDistance2 +
+                                            VectorUtils.LengthXZ((Vector3) (vehicleData.m_targetPos2 -
+                                                                            vehicleData.m_targetPos1));
+                    float a3 = Mathf.Min(a2,
+                        CargoFerryAI.CalculateMaxSpeed(targetDistance3, vehicleData.m_targetPos3.w, braking * 0.9f));
+                    float targetDistance4 = targetDistance3 +
+                                            VectorUtils.LengthXZ((Vector3) (vehicleData.m_targetPos3 -
+                                                                            vehicleData.m_targetPos2));
+                    if ((double) vehicleData.m_targetPos3.w < 0.00999999977648258)
+                        targetDistance4 = Mathf.Max(0.0f,
+                            targetDistance4 - this.m_info.m_generatedInfo.m_size.z * 0.5f);
+                    maxSpeed = Mathf.Min(a3, CargoFerryAI.CalculateMaxSpeed(targetDistance4, 0.0f, braking * 0.9f));
+                    if (!CargoFerryAI.DisableCollisionCheck(leaderID, ref leaderData))
+                        this.CheckOtherVehicles(vehicleID, ref vehicleData, ref frameData, ref maxSpeed,
+                            ref blocked, ref zero2, maxDistance, braking * 0.9f, lodPhysics);
+                    if ((double) maxSpeed < (double) num1)
                     {
-                        minSqrDistance = minSqrDistanceA;
-                        refPos = frameData.m_position;
-                        flag1 = true;
+                        float num7 = Mathf.Max(acceleration, Mathf.Min(braking, num1));
+                        f2 = Mathf.Max(maxSpeed, num1 - num7);
                     }
                     else
                     {
-                        minSqrDistance = minSqrDistanceB;
-                        refPos = (Vector3) vehicleData.GetTargetPos(index - 1);
+                        float num7 = Mathf.Max(acceleration, Mathf.Min(braking, -num1));
+                        f2 = Mathf.Min(maxSpeed, num1 + num7);
+                    }
+                }
+            }
+            else if ((double) num1 < (double) this.SlowDownThreshold(ref vehicleData) && flag1 &&
+                     this.ArriveAtDestination(leaderID, ref leaderData))
+            {
+                leaderData.Unspawn(leaderID);
+                if ((int) leaderID != (int) vehicleID)
+                    return;
+                frameData = leaderData.m_frame0;
+                return;
+            }
+
+            if ((leaderData.m_flags & Vehicle.Flags.Stopped) == ~(Vehicle.Flags.Created | Vehicle.Flags.Deleted |
+                                                                  Vehicle.Flags.Spawned | Vehicle.Flags.Inverted |
+                                                                  Vehicle.Flags.TransferToTarget |
+                                                                  Vehicle.Flags.TransferToSource |
+                                                                  Vehicle.Flags.Emergency1 | Vehicle.Flags.Emergency2 |
+                                                                  Vehicle.Flags.WaitingPath | Vehicle.Flags.Stopped |
+                                                                  Vehicle.Flags.Leaving | Vehicle.Flags.Arriving |
+                                                                  Vehicle.Flags.Reversed | Vehicle.Flags.TakingOff |
+                                                                  Vehicle.Flags.Flying | Vehicle.Flags.Landing |
+                                                                  Vehicle.Flags.WaitingSpace |
+                                                                  Vehicle.Flags.WaitingCargo |
+                                                                  Vehicle.Flags.GoingBack |
+                                                                  Vehicle.Flags.WaitingTarget |
+                                                                  Vehicle.Flags.Importing | Vehicle.Flags.Exporting |
+                                                                  Vehicle.Flags.Parking | Vehicle.Flags.CustomName |
+                                                                  Vehicle.Flags.OnGravel |
+                                                                  Vehicle.Flags.WaitingLoading |
+                                                                  Vehicle.Flags.Congestion |
+                                                                  Vehicle.Flags.DummyTraffic |
+                                                                  Vehicle.Flags.Underground | Vehicle.Flags.Transition |
+                                                                  Vehicle.Flags.InsideBuilding |
+                                                                  Vehicle.Flags.LeftHandDrive) &&
+                (double) maxSpeed < 0.100000001490116)
+                blocked = true;
+            vehicleData.m_blockCounter =
+                !blocked ? (byte) 0 : (byte) Mathf.Min((int) vehicleData.m_blockCounter + 1, (int) byte.MaxValue);
+            Vector3 vector3_3;
+            if ((double) len1 > 1.0)
+            {
+                num5 = Mathf.Asin(vector3_2.x) * Mathf.Sign(f2);
+                vector3_3 = vector3_2 * f2;
+            }
+            else
+            {
+                f2 = 0.0f;
+                Vector3 vector = v2 * 0.5f - vector3_1;
+                vector.y = 0.0f;
+                Vector3 vector3_4 = Vector3.ClampMagnitude(vector, braking);
+                vector3_3 = vector3_1 + vector3_4;
+            }
+
+            bool flag2 = ((int) currentFrameIndex + (int) leaderID & 16) != 0;
+            Vector3 vector3_5 = vector3_3 - vector3_1;
+            vector3_5.y = 0.0f;
+            Vector3 forward1 = frameData.m_rotation * vector3_3;
+            bool hasWater;
+            forward1.y =
+                Singleton<TerrainManager>.instance.SampleBlockHeightSmoothWithWater(
+                    frameData.m_position + frameData.m_velocity, false, 0.0f, out hasWater) - frameData.m_position.y;
+            if (hasWater)
+                leaderData.m_flags2 |= Vehicle.Flags2.Floating;
+            else
+                leaderData.m_flags2 &= ~Vehicle.Flags2.Floating;
+            frameData.m_velocity = forward1 + zero2;
+            frameData.m_position += frameData.m_velocity * 0.5f;
+            frameData.m_swayVelocity = frameData.m_swayVelocity * (1f - this.m_info.m_dampers) -
+                                       vector3_5 * (1f - this.m_info.m_springs) -
+                                       frameData.m_swayPosition * this.m_info.m_springs;
+            frameData.m_swayPosition += frameData.m_swayVelocity * 0.5f;
+            frameData.m_steerAngle = num5;
+            frameData.m_travelDistance += vector3_3.z;
+            frameData.m_lightIntensity.x = 5f;
+            frameData.m_lightIntensity.y = (double) vector3_5.z >= -0.100000001490116 ? 0.5f : 5f;
+            frameData.m_lightIntensity.z = (double) num5 >= -0.100000001490116 || !flag2 ? 0.0f : 5f;
+            frameData.m_lightIntensity.w = (double) num5 <= 0.100000001490116 || !flag2 ? 0.0f : 5f;
+            frameData.m_underground = (vehicleData.m_flags & Vehicle.Flags.Underground) != ~(Vehicle.Flags.Created |
+                Vehicle.Flags.Deleted | Vehicle.Flags.Spawned | Vehicle.Flags.Inverted |
+                Vehicle.Flags.TransferToTarget |
+                Vehicle.Flags.TransferToSource | Vehicle.Flags.Emergency1 | Vehicle.Flags.Emergency2 |
+                Vehicle.Flags.WaitingPath | Vehicle.Flags.Stopped | Vehicle.Flags.Leaving | Vehicle.Flags.Arriving |
+                Vehicle.Flags.Reversed | Vehicle.Flags.TakingOff | Vehicle.Flags.Flying | Vehicle.Flags.Landing |
+                Vehicle.Flags.WaitingSpace | Vehicle.Flags.WaitingCargo | Vehicle.Flags.GoingBack |
+                Vehicle.Flags.WaitingTarget | Vehicle.Flags.Importing | Vehicle.Flags.Exporting |
+                Vehicle.Flags.Parking |
+                Vehicle.Flags.CustomName | Vehicle.Flags.OnGravel | Vehicle.Flags.WaitingLoading |
+                Vehicle.Flags.Congestion | Vehicle.Flags.DummyTraffic | Vehicle.Flags.Underground |
+                Vehicle.Flags.Transition | Vehicle.Flags.InsideBuilding | Vehicle.Flags.LeftHandDrive);
+            frameData.m_transition = (vehicleData.m_flags & Vehicle.Flags.Transition) != ~(Vehicle.Flags.Created |
+                Vehicle.Flags.Deleted | Vehicle.Flags.Spawned | Vehicle.Flags.Inverted |
+                Vehicle.Flags.TransferToTarget |
+                Vehicle.Flags.TransferToSource | Vehicle.Flags.Emergency1 | Vehicle.Flags.Emergency2 |
+                Vehicle.Flags.WaitingPath | Vehicle.Flags.Stopped | Vehicle.Flags.Leaving | Vehicle.Flags.Arriving |
+                Vehicle.Flags.Reversed | Vehicle.Flags.TakingOff | Vehicle.Flags.Flying | Vehicle.Flags.Landing |
+                Vehicle.Flags.WaitingSpace | Vehicle.Flags.WaitingCargo | Vehicle.Flags.GoingBack |
+                Vehicle.Flags.WaitingTarget | Vehicle.Flags.Importing | Vehicle.Flags.Exporting |
+                Vehicle.Flags.Parking |
+                Vehicle.Flags.CustomName | Vehicle.Flags.OnGravel | Vehicle.Flags.WaitingLoading |
+                Vehicle.Flags.Congestion | Vehicle.Flags.DummyTraffic | Vehicle.Flags.Underground |
+                Vehicle.Flags.Transition | Vehicle.Flags.InsideBuilding | Vehicle.Flags.LeftHandDrive);
+            if ((vehicleData.m_flags & Vehicle.Flags.Parking) != ~(Vehicle.Flags.Created | Vehicle.Flags.Deleted |
+                                                                   Vehicle.Flags.Spawned | Vehicle.Flags.Inverted |
+                                                                   Vehicle.Flags.TransferToTarget |
+                                                                   Vehicle.Flags.TransferToSource |
+                                                                   Vehicle.Flags.Emergency1 | Vehicle.Flags.Emergency2 |
+                                                                   Vehicle.Flags.WaitingPath | Vehicle.Flags.Stopped |
+                                                                   Vehicle.Flags.Leaving | Vehicle.Flags.Arriving |
+                                                                   Vehicle.Flags.Reversed | Vehicle.Flags.TakingOff |
+                                                                   Vehicle.Flags.Flying | Vehicle.Flags.Landing |
+                                                                   Vehicle.Flags.WaitingSpace |
+                                                                   Vehicle.Flags.WaitingCargo |
+                                                                   Vehicle.Flags.GoingBack |
+                                                                   Vehicle.Flags.WaitingTarget |
+                                                                   Vehicle.Flags.Importing | Vehicle.Flags.Exporting |
+                                                                   Vehicle.Flags.Parking | Vehicle.Flags.CustomName |
+                                                                   Vehicle.Flags.OnGravel |
+                                                                   Vehicle.Flags.WaitingLoading |
+                                                                   Vehicle.Flags.Congestion |
+                                                                   Vehicle.Flags.DummyTraffic |
+                                                                   Vehicle.Flags.Underground |
+                                                                   Vehicle.Flags.Transition |
+                                                                   Vehicle.Flags.InsideBuilding |
+                                                                   Vehicle.Flags.LeftHandDrive) &&
+                (double) len1 <= 1.0 &&
+                flag1)
+            {
+                Vector3 forward2 = (Vector3) (vehicleData.m_targetPos1 - vehicleData.m_targetPos0);
+                forward2.y = 0.0f;
+                if ((double) forward2.sqrMagnitude > 0.00999999977648258)
+                    frameData.m_rotation =
+                        Quaternion.RotateTowards(frameData.m_rotation, Quaternion.LookRotation(forward2), 15f);
+            }
+            else if ((double) f2 > 0.100000001490116)
+            {
+                forward1.y = 0.0f;
+                if ((double) forward1.sqrMagnitude > 0.00999999977648258)
+                    frameData.m_rotation =
+                        Quaternion.RotateTowards(frameData.m_rotation, Quaternion.LookRotation(forward1), 15f);
+            }
+            else if ((double) f2 < -0.100000001490116)
+            {
+                forward1.y = 0.0f;
+                if ((double) forward1.sqrMagnitude > 0.00999999977648258)
+                    frameData.m_rotation =
+                        Quaternion.RotateTowards(frameData.m_rotation, Quaternion.LookRotation(-forward1), 15f);
+            }
+
+            base.SimulationStep(vehicleID, ref vehicleData, ref frameData, leaderID, ref leaderData, lodPhysics);
+        }
+        else
+        {
+            float num1 = this.m_info.m_generatedInfo.m_size.z * 0.5f;
+            Vector3 vector3_1 = frameData.m_rotation * Vector3.forward;
+            frameData.m_position += frameData.m_velocity * 0.5f;
+            frameData.m_swayPosition += frameData.m_swayVelocity * 0.5f;
+            float num2 = -Mathf.Atan2(vector3_1.x, vector3_1.z) + frameData.m_angleVelocity * 0.5f;
+            frameData.m_rotation = Quaternion.AngleAxis(num2 * 57.29578f, Vector3.down);
+            Vector3 vector3_2 = frameData.m_rotation * new Vector3(0.0f, 0.0f, num1);
+            Vector3 vector3_3 = frameData.m_position + vector3_2;
+            Vector3 refPos = frameData.m_position - vector3_2;
+            float acceleration = this.m_info.m_acceleration;
+            float num3 = this.m_info.m_braking;
+            Vector3 vector3_4 = new Vector3(vector3_3.z - refPos.z, 0.0f, refPos.x - vector3_3.x) +
+                                new Vector3(vehicleData.m_targetPos1.z - vehicleData.m_targetPos0.z, 0.0f,
+                                    vehicleData.m_targetPos0.x - vehicleData.m_targetPos1.x);
+            if (Singleton<SimulationManager>.instance.m_metaData.m_invertTraffic == SimulationMetaData.MetaBool.True)
+                vector3_4 = -vector3_4;
+            vector3_4 = vector3_4.normalized * 20f;
+            Vector3 vector3_5 = (Vector3) vehicleData.m_targetPos0 - refPos;
+            Vector3 vector3_6 = (Vector3) vehicleData.m_targetPos1 - vector3_3;
+            Vector3 rhs1;
+            Vector3 lhs1;
+            if ((double) vehicleData.m_targetPos1.w > 10.0)
+            {
+                rhs1 = vector3_5 + vector3_4;
+                lhs1 = vector3_6 + vector3_4;
+            }
+            else
+            {
+                float num4 = Mathf.Min(1f, vector3_6.magnitude * 0.01f);
+                rhs1 = vector3_5 + vector3_4 * num4;
+                lhs1 = vector3_6 + vector3_4 * num4;
+            }
+
+            if ((double) vehicleData.m_targetPos0.w > 10.0)
+                leaderData.m_flags &= Vehicle.Flags.Created | Vehicle.Flags.Deleted | Vehicle.Flags.Spawned |
+                                      Vehicle.Flags.Inverted | Vehicle.Flags.TransferToTarget |
+                                      Vehicle.Flags.TransferToSource | Vehicle.Flags.Emergency1 |
+                                      Vehicle.Flags.Emergency2 | Vehicle.Flags.WaitingPath | Vehicle.Flags.Stopped |
+                                      Vehicle.Flags.Arriving | Vehicle.Flags.Reversed | Vehicle.Flags.TakingOff |
+                                      Vehicle.Flags.Flying | Vehicle.Flags.Landing | Vehicle.Flags.WaitingSpace |
+                                      Vehicle.Flags.WaitingCargo | Vehicle.Flags.GoingBack |
+                                      Vehicle.Flags.WaitingTarget | Vehicle.Flags.Importing | Vehicle.Flags.Exporting |
+                                      Vehicle.Flags.Parking | Vehicle.Flags.CustomName | Vehicle.Flags.OnGravel |
+                                      Vehicle.Flags.WaitingLoading | Vehicle.Flags.Congestion |
+                                      Vehicle.Flags.DummyTraffic | Vehicle.Flags.Underground |
+                                      Vehicle.Flags.Transition | Vehicle.Flags.InsideBuilding |
+                                      Vehicle.Flags.LeftHandDrive;
+            float magnitude1 = frameData.m_velocity.magnitude;
+            float sqrMagnitude1 = rhs1.sqrMagnitude;
+            float sqrMagnitude2 = ((Vector3) vehicleData.m_targetPos1 - refPos).sqrMagnitude;
+            float num5 =
+                Mathf.Max(
+                    magnitude1 + (float) ((double) magnitude1 * (double) magnitude1 * 0.100000001490116) + acceleration,
+                    num1);
+            float num6 = num5 + num1 * 2f;
+            float maxDistance =
+                (float) (((double) magnitude1 + (double) acceleration) *
+                    (0.5 + 0.5 * ((double) magnitude1 + (double) acceleration) / (double) num3) + (double) num1 * 2.0);
+            float num7 = Mathf.Max((float) (((double) maxDistance - (double) num5) / 2.0), 5f);
+            float num8 = num5 * num5;
+            float minSqrDistanceB = num6 * num6;
+            float minSqrDistanceC = num7 * num7;
+            int index = 0;
+            bool flag = false;
+            if (
+                ((double) sqrMagnitude1 < (double) num8 || (double) sqrMagnitude2 < (double) minSqrDistanceB ||
+                 ((double) vehicleData.m_targetPos0.w < 0.00999999977648258 ||
+                  (double) vehicleData.m_targetPos1.w < 0.00999999977648258)) &&
+                (leaderData.m_flags & (Vehicle.Flags.WaitingPath | Vehicle.Flags.Stopped)) == ~(Vehicle.Flags.Created |
+                    Vehicle.Flags.Deleted | Vehicle.Flags.Spawned | Vehicle.Flags.Inverted |
+                    Vehicle.Flags.TransferToTarget | Vehicle.Flags.TransferToSource | Vehicle.Flags.Emergency1 |
+                    Vehicle.Flags.Emergency2 | Vehicle.Flags.WaitingPath | Vehicle.Flags.Stopped |
+                    Vehicle.Flags.Leaving | Vehicle.Flags.Arriving | Vehicle.Flags.Reversed | Vehicle.Flags.TakingOff |
+                    Vehicle.Flags.Flying | Vehicle.Flags.Landing | Vehicle.Flags.WaitingSpace |
+                    Vehicle.Flags.WaitingCargo | Vehicle.Flags.GoingBack | Vehicle.Flags.WaitingTarget |
+                    Vehicle.Flags.Importing | Vehicle.Flags.Exporting | Vehicle.Flags.Parking |
+                    Vehicle.Flags.CustomName | Vehicle.Flags.OnGravel | Vehicle.Flags.WaitingLoading |
+                    Vehicle.Flags.Congestion | Vehicle.Flags.DummyTraffic | Vehicle.Flags.Underground |
+                    Vehicle.Flags.Transition | Vehicle.Flags.InsideBuilding | Vehicle.Flags.LeftHandDrive))
+            {
+                if (leaderData.m_path != 0U)
+                    this.UpdatePathTargetPositions(vehicleID, ref vehicleData, refPos, leaderID, ref leaderData,
+                        ref index, num8, minSqrDistanceB, minSqrDistanceC);
+                if (index < 4 && (leaderData.m_flags & Vehicle.Flags.WaitingPath) == ~(Vehicle.Flags.Created |
+                    Vehicle.Flags.Deleted | Vehicle.Flags.Spawned | Vehicle.Flags.Inverted |
+                    Vehicle.Flags.TransferToTarget | Vehicle.Flags.TransferToSource | Vehicle.Flags.Emergency1 |
+                    Vehicle.Flags.Emergency2 | Vehicle.Flags.WaitingPath | Vehicle.Flags.Stopped |
+                    Vehicle.Flags.Leaving | Vehicle.Flags.Arriving | Vehicle.Flags.Reversed | Vehicle.Flags.TakingOff |
+                    Vehicle.Flags.Flying | Vehicle.Flags.Landing | Vehicle.Flags.WaitingSpace |
+                    Vehicle.Flags.WaitingCargo | Vehicle.Flags.GoingBack | Vehicle.Flags.WaitingTarget |
+                    Vehicle.Flags.Importing | Vehicle.Flags.Exporting | Vehicle.Flags.Parking |
+                    Vehicle.Flags.CustomName | Vehicle.Flags.OnGravel | Vehicle.Flags.WaitingLoading |
+                    Vehicle.Flags.Congestion | Vehicle.Flags.DummyTraffic | Vehicle.Flags.Underground |
+                    Vehicle.Flags.Transition | Vehicle.Flags.InsideBuilding | Vehicle.Flags.LeftHandDrive))
+                {
+                    if (leaderData.m_path != 0U)
+                    {
+                        Singleton<PathManager>.instance.ReleasePath(leaderData.m_path);
+                        leaderData.m_path = 0U;
                     }
 
-                    int num4 = index;
-                    this.UpdateBuildingTargetPositions(vehicleID, ref vehicleData, refPos, leaderID, ref leaderData,
-                        ref index, minSqrDistance);
-                    if (index == num4)
-                        break;
+                    index = 0;
+                    flag = true;
+                    this.UpdateBuildingTargetPositions(vehicleID, ref vehicleData, frameData.m_position, leaderID,
+                        ref leaderData, ref index, num8);
                 }
 
-                if (index != 0)
+                for (; index < 4; ++index)
                 {
-                    Vector4 targetPos = vehicleData.GetTargetPos(index - 1);
-                    while (index < 4)
-                        vehicleData.SetTargetPos(index++, targetPos);
+                    Vector4 vector4 = (Vector4) (frameData.m_rotation *
+                                                 new Vector3(0.0f, 0.0f, this.m_info.m_generatedInfo.m_size.z));
+                    vehicleData.SetTargetPos(index, vehicleData.GetTargetPos(index - 1) + vector4);
+                }
+
+                Vector3 vector3_7 = (Vector3) vehicleData.m_targetPos0 - refPos;
+                Vector3 vector3_8 = (Vector3) vehicleData.m_targetPos1 - vector3_3;
+                if ((double) vehicleData.m_targetPos1.w > 10.0)
+                {
+                    rhs1 = vector3_7 + vector3_4;
+                    lhs1 = vector3_8 + vector3_4;
+                }
+                else
+                {
+                    float num4 = Mathf.Min(1f, vector3_8.magnitude * 0.01f);
+                    rhs1 = vector3_7 + vector3_4 * num4;
+                    lhs1 = vector3_8 + vector3_4 * num4;
                 }
             }
 
-            v1 = (Vector3) vehicleData.m_targetPos0 - frameData.m_position;
-            f1 = VectorUtils.LengthSqrXZ(v1);
-        }
-
-        if (leaderData.m_path != 0U)
-        {
-            NetManager instance1 = Singleton<NetManager>.instance;
-            byte num4 = leaderData.m_pathPositionIndex;
-            byte lastPathOffset = leaderData.m_lastPathOffset;
-            if (num4 == byte.MaxValue)
-                num4 = (byte) 0;
-            PathManager instance2 = Singleton<PathManager>.instance;
-            PathUnit.Position position;
-            if (instance2.m_pathUnits.m_buffer[leaderData.m_path].GetPosition((int) num4 >> 1, out position))
+            this.ReserveSpace(vehicleID, ref vehicleData, ref frameData, (double) magnitude1 > 0.100000001490116);
+            float a1 = Mathf.Clamp(Vector3.Dot(lhs1, rhs1) / Mathf.Max(1f, rhs1.sqrMagnitude), -1f, 1f);
+            Vector3 vector3_9 = (double) a1 >= 0.0
+                ? (rhs1 + lhs1) * 0.5f
+                : lhs1 + (rhs1 - lhs1) * (float) (0.5 + 0.5 * (double) a1 * (double) a1);
+            Quaternion quaternion = Quaternion.Inverse(frameData.m_rotation);
+            Vector3 vector3_10 = quaternion * vector3_9;
+            Vector3 vector3_11 = quaternion * frameData.m_velocity;
+            Vector3 lhs2 = Vector3.forward;
+            float magnitude2 = vector3_10.magnitude;
+            float maxLength1 = 0.0f;
+            bool blocked = false;
+            Vector3 vector3_12 = (Vector3) vehicleData.m_targetPos1 * 1.5f - (Vector3) vehicleData.m_targetPos0 -
+                                 frameData.m_position * 0.5f;
+            Vector3 vector3_13;
+            if ((double) vehicleData.m_targetPos1.w > 10.0)
             {
-                instance1.m_segments.m_buffer[(int) position.m_segment]
-                    .AddTraffic(Mathf.RoundToInt(this.m_info.m_generatedInfo.m_size.z * 3f), this.GetNoiseLevel());
-                if (((int) num4 & 1) == 0 || lastPathOffset == (byte) 0 ||
-                    (leaderData.m_flags & Vehicle.Flags.WaitingPath) != ~(Vehicle.Flags.Created |
-                                                                          Vehicle.Flags.Deleted |
-                                                                          Vehicle.Flags.Spawned |
-                                                                          Vehicle.Flags.Inverted |
-                                                                          Vehicle.Flags.TransferToTarget |
-                                                                          Vehicle.Flags.TransferToSource |
-                                                                          Vehicle.Flags.Emergency1 |
-                                                                          Vehicle.Flags.Emergency2 |
-                                                                          Vehicle.Flags.WaitingPath |
-                                                                          Vehicle.Flags.Stopped |
-                                                                          Vehicle.Flags.Leaving |
-                                                                          Vehicle.Flags.Arriving |
-                                                                          Vehicle.Flags.Reversed |
-                                                                          Vehicle.Flags.TakingOff |
-                                                                          Vehicle.Flags.Flying | Vehicle.Flags.Landing |
-                                                                          Vehicle.Flags.WaitingSpace |
-                                                                          Vehicle.Flags.WaitingCargo |
-                                                                          Vehicle.Flags.GoingBack |
-                                                                          Vehicle.Flags.WaitingTarget |
-                                                                          Vehicle.Flags.Importing |
-                                                                          Vehicle.Flags.Exporting |
-                                                                          Vehicle.Flags.Parking |
-                                                                          Vehicle.Flags.CustomName |
-                                                                          Vehicle.Flags.OnGravel |
-                                                                          Vehicle.Flags.WaitingLoading |
-                                                                          Vehicle.Flags.Congestion |
-                                                                          Vehicle.Flags.DummyTraffic |
-                                                                          Vehicle.Flags.Underground |
-                                                                          Vehicle.Flags.Transition |
-                                                                          Vehicle.Flags.InsideBuilding |
-                                                                          Vehicle.Flags.LeftHandDrive))
-                {
-                    uint laneId = PathManager.GetLaneID(position);
-                    if (laneId != 0U)
-                        instance1.m_lanes.m_buffer[laneId].ReserveSpace(this.m_info.m_generatedInfo.m_size.z);
-                }
-                else if (instance2.m_pathUnits.m_buffer[leaderData.m_path]
-                    .GetNextPosition((int) num4 >> 1, out position))
-                {
-                    uint laneId = PathManager.GetLaneID(position);
-                    if (laneId != 0U)
-                        instance1.m_lanes.m_buffer[laneId].ReserveSpace(this.m_info.m_generatedInfo.m_size.z);
-                }
+                vector3_13 = vector3_12 + vector3_4 * 0.5f;
             }
-        }
+            else
+            {
+                float num4 = Mathf.Min(1f, lhs1.magnitude * 0.01f);
+                vector3_13 = vector3_12 + vector3_4 * (num4 * 0.5f);
+            }
 
-        float maxSpeed = (leaderData.m_flags & Vehicle.Flags.Stopped) != ~(Vehicle.Flags.Created |
+            float num9;
+            if ((leaderData.m_flags & Vehicle.Flags.Stopped) != ~(Vehicle.Flags.Created | Vehicle.Flags.Deleted |
+                                                                  Vehicle.Flags.Spawned | Vehicle.Flags.Inverted |
+                                                                  Vehicle.Flags.TransferToTarget |
+                                                                  Vehicle.Flags.TransferToSource |
+                                                                  Vehicle.Flags.Emergency1 | Vehicle.Flags.Emergency2 |
+                                                                  Vehicle.Flags.WaitingPath | Vehicle.Flags.Stopped |
+                                                                  Vehicle.Flags.Leaving | Vehicle.Flags.Arriving |
+                                                                  Vehicle.Flags.Reversed | Vehicle.Flags.TakingOff |
+                                                                  Vehicle.Flags.Flying | Vehicle.Flags.Landing |
+                                                                  Vehicle.Flags.WaitingSpace |
+                                                                  Vehicle.Flags.WaitingCargo | Vehicle.Flags.GoingBack |
+                                                                  Vehicle.Flags.WaitingTarget |
+                                                                  Vehicle.Flags.Importing | Vehicle.Flags.Exporting |
+                                                                  Vehicle.Flags.Parking | Vehicle.Flags.CustomName |
+                                                                  Vehicle.Flags.OnGravel |
+                                                                  Vehicle.Flags.WaitingLoading |
+                                                                  Vehicle.Flags.Congestion |
+                                                                  Vehicle.Flags.DummyTraffic |
+                                                                  Vehicle.Flags.Underground | Vehicle.Flags.Transition |
+                                                                  Vehicle.Flags.InsideBuilding |
+                                                                  Vehicle.Flags.LeftHandDrive))
+            {
+                num9 = 0.0f;
+            }
+            else
+            {
+                float num4 = -Mathf.Atan2(vector3_13.x, vector3_13.z);
+                num9 = Mathf.DeltaAngle(num2 * 57.29578f, num4 * 57.29578f) * ((float) System.Math.PI / 180f);
+            }
+
+            if ((double) magnitude2 > 1.0)
+            {
+                lhs2 = vector3_10 / Mathf.Max(1f, magnitude2);
+                float maxSpeed1;
+                if ((leaderData.m_flags & Vehicle.Flags.Stopped) != ~(Vehicle.Flags.Created | Vehicle.Flags.Deleted |
+                                                                      Vehicle.Flags.Spawned | Vehicle.Flags.Inverted |
+                                                                      Vehicle.Flags.TransferToTarget |
+                                                                      Vehicle.Flags.TransferToSource |
+                                                                      Vehicle.Flags.Emergency1 |
+                                                                      Vehicle.Flags.Emergency2 |
+                                                                      Vehicle.Flags.WaitingPath |
+                                                                      Vehicle.Flags.Stopped | Vehicle.Flags.Leaving |
+                                                                      Vehicle.Flags.Arriving | Vehicle.Flags.Reversed |
+                                                                      Vehicle.Flags.TakingOff | Vehicle.Flags.Flying |
+                                                                      Vehicle.Flags.Landing |
+                                                                      Vehicle.Flags.WaitingSpace |
+                                                                      Vehicle.Flags.WaitingCargo |
+                                                                      Vehicle.Flags.GoingBack |
+                                                                      Vehicle.Flags.WaitingTarget |
+                                                                      Vehicle.Flags.Importing |
+                                                                      Vehicle.Flags.Exporting | Vehicle.Flags.Parking |
+                                                                      Vehicle.Flags.CustomName |
+                                                                      Vehicle.Flags.OnGravel |
+                                                                      Vehicle.Flags.WaitingLoading |
+                                                                      Vehicle.Flags.Congestion |
+                                                                      Vehicle.Flags.DummyTraffic |
+                                                                      Vehicle.Flags.Underground |
+                                                                      Vehicle.Flags.Transition |
+                                                                      Vehicle.Flags.InsideBuilding |
+                                                                      Vehicle.Flags.LeftHandDrive) ||
+                    (leaderData.m_flags2 & Vehicle.Flags2.Floating) == (Vehicle.Flags2) 0)
+                {
+                    maxSpeed1 = 0.0f;
+                }
+                else
+                {
+                    float maxSpeed2 = this.m_info.m_maxSpeed;
+                    Vector3 zero2 = Vector3.zero; //taken from FerryAI - see there
+                    float curve1 = (float) (1.57079637050629 * (1.0 - (double) Mathf.Min(a1, lhs2.z)));
+                    float a2 = Mathf.Min(maxSpeed2,
+                        this.CalculateTargetSpeed(vehicleID, ref vehicleData, vehicleData.m_targetPos0.w, curve1));
+                    Vector3 vector3_7 = (Vector3) vehicleData.m_targetPos3 - (Vector3) vehicleData.m_targetPos0;
+                    Vector3 rhs2 = Vector3.Normalize(quaternion * vector3_7);
+                    float curve2 = (float) (1.57079637050629 * (1.0 - (double) Vector3.Dot(lhs2, rhs2)));
+                    float targetDistance1 = magnitude2;
+                    float a3 = Mathf.Min(a2,
+                        CargoFerryAI.CalculateMaxSpeed(targetDistance1,
+                            Mathf.Min(vehicleData.m_targetPos2.w,
+                                this.CalculateTargetSpeed(vehicleID, ref vehicleData, vehicleData.m_targetPos1.w,
+                                    curve2)), num3));
+                    float targetDistance2 = targetDistance1 +
+                                            Vector3.Magnitude((Vector3) (vehicleData.m_targetPos2 -
+                                                                         vehicleData.m_targetPos1));
+                    maxSpeed1 = Mathf.Min(
+                        Mathf.Min(a3, CargoFerryAI.CalculateMaxSpeed(targetDistance2, vehicleData.m_targetPos3.w, num3)),
+                        CargoFerryAI.CalculateMaxSpeed(
+                            targetDistance2 +
+                            Vector3.Magnitude((Vector3) (vehicleData.m_targetPos3 - vehicleData.m_targetPos2)), 0.0f,
+                            num3));
+                    //added zero2 to match FerryAI requirements
+                    this.CheckOtherVehicles(vehicleID, ref vehicleData, ref frameData, ref maxSpeed1, ref blocked, ref zero2, 
+                        maxDistance, num3 * 0.9f, lodPhysics);
+                }
+
+                maxLength1 = (double) maxSpeed1 >= (double) magnitude1
+                    ? Mathf.Min(maxSpeed1, magnitude1 + acceleration)
+                    : Mathf.Max(maxSpeed1, magnitude1 - num3);
+                if ((leaderData.m_flags & Vehicle.Flags.Stopped) == ~(Vehicle.Flags.Created | Vehicle.Flags.Deleted |
+                                                                      Vehicle.Flags.Spawned | Vehicle.Flags.Inverted |
+                                                                      Vehicle.Flags.TransferToTarget |
+                                                                      Vehicle.Flags.TransferToSource |
+                                                                      Vehicle.Flags.Emergency1 |
+                                                                      Vehicle.Flags.Emergency2 |
+                                                                      Vehicle.Flags.WaitingPath |
+                                                                      Vehicle.Flags.Stopped | Vehicle.Flags.Leaving |
+                                                                      Vehicle.Flags.Arriving | Vehicle.Flags.Reversed |
+                                                                      Vehicle.Flags.TakingOff | Vehicle.Flags.Flying |
+                                                                      Vehicle.Flags.Landing |
+                                                                      Vehicle.Flags.WaitingSpace |
+                                                                      Vehicle.Flags.WaitingCargo |
+                                                                      Vehicle.Flags.GoingBack |
+                                                                      Vehicle.Flags.WaitingTarget |
+                                                                      Vehicle.Flags.Importing |
+                                                                      Vehicle.Flags.Exporting | Vehicle.Flags.Parking |
+                                                                      Vehicle.Flags.CustomName |
+                                                                      Vehicle.Flags.OnGravel |
+                                                                      Vehicle.Flags.WaitingLoading |
+                                                                      Vehicle.Flags.Congestion |
+                                                                      Vehicle.Flags.DummyTraffic |
+                                                                      Vehicle.Flags.Underground |
+                                                                      Vehicle.Flags.Transition |
+                                                                      Vehicle.Flags.InsideBuilding |
+                                                                      Vehicle.Flags.LeftHandDrive) &&
+                    (double) maxSpeed1 < 0.100000001490116)
+                    blocked = true;
+            }
+            else if ((double) magnitude1 < 0.100000001490116 && flag &&
+                     this.ArriveAtDestination(leaderID, ref leaderData))
+            {
+                leaderData.Unspawn(leaderID);
+                return;
+            }
+
+            leaderData.m_blockCounter = !blocked
+                ? (byte) 0
+                : (byte) Mathf.Min((int) leaderData.m_blockCounter + 1, (int) byte.MaxValue);
+            float b = Mathf.Clamp(num9, (float) ((double) maxLength1 / (double) num1 * -2.0),
+                (float) ((double) maxLength1 / (double) num1 * 2.0));
+            frameData.m_angleVelocity = (double) b <= (double) frameData.m_angleVelocity
+                ? Mathf.Max(-0.2f,
+                    Mathf.Max(
+                        (float) ((double) frameData.m_angleVelocity * 0.899999976158142 -
+                                 (double) acceleration / (double) num1), b))
+                : Mathf.Min(0.2f,
+                    Mathf.Min(
+                        (float) ((double) frameData.m_angleVelocity * 0.899999976158142 +
+                                 (double) acceleration / (double) num1), b));
+            Vector3 vector = lhs2 * maxLength1;
+            if ((leaderData.m_flags & Vehicle.Flags.Leaving) != ~(Vehicle.Flags.Created | Vehicle.Flags.Deleted |
+                                                                  Vehicle.Flags.Spawned | Vehicle.Flags.Inverted |
+                                                                  Vehicle.Flags.TransferToTarget |
+                                                                  Vehicle.Flags.TransferToSource |
+                                                                  Vehicle.Flags.Emergency1 | Vehicle.Flags.Emergency2 |
+                                                                  Vehicle.Flags.WaitingPath | Vehicle.Flags.Stopped |
+                                                                  Vehicle.Flags.Leaving | Vehicle.Flags.Arriving |
+                                                                  Vehicle.Flags.Reversed | Vehicle.Flags.TakingOff |
+                                                                  Vehicle.Flags.Flying | Vehicle.Flags.Landing |
+                                                                  Vehicle.Flags.WaitingSpace |
+                                                                  Vehicle.Flags.WaitingCargo | Vehicle.Flags.GoingBack |
+                                                                  Vehicle.Flags.WaitingTarget |
+                                                                  Vehicle.Flags.Importing | Vehicle.Flags.Exporting |
+                                                                  Vehicle.Flags.Parking | Vehicle.Flags.CustomName |
+                                                                  Vehicle.Flags.OnGravel |
+                                                                  Vehicle.Flags.WaitingLoading |
+                                                                  Vehicle.Flags.Congestion |
+                                                                  Vehicle.Flags.DummyTraffic |
+                                                                  Vehicle.Flags.Underground | Vehicle.Flags.Transition |
+                                                                  Vehicle.Flags.InsideBuilding |
+                                                                  Vehicle.Flags.LeftHandDrive))
+            {
+                vector.x -= frameData.m_angleVelocity * num1;
+                vector = Vector3.ClampMagnitude(vector, maxLength1);
+            }
+
+            Vector3 vector3_14 = vector - vector3_11;
+            bool hasWater;
+            float num10 =
+                Singleton<TerrainManager>.instance.SampleBlockHeightSmoothWithWater(
+                    frameData.m_position + frameData.m_velocity, false, 0.0f, out hasWater);
+            if (hasWater)
+            {
+                leaderData.m_flags2 |= Vehicle.Flags2.Floating;
+            }
+            else
+            {
+                leaderData.m_flags2 &= ~Vehicle.Flags2.Floating;
+                num3 = Mathf.Max(num3, Mathf.Max(4f, num10 - frameData.m_position.y));
+                float maxLength2 = Mathf.Max(0.0f, maxLength1 - num3);
+                vector = Vector3.ClampMagnitude(vector, maxLength2);
+                vector3_14 = vector - vector3_11;
+            }
+
+            frameData.m_velocity = Vector3.MoveTowards(frameData.m_velocity, frameData.m_rotation * vector, num3);
+            frameData.m_position += frameData.m_velocity * 0.5f;
+            float num11 = num2 + frameData.m_angleVelocity * 0.5f;
+            frameData.m_rotation = Quaternion.AngleAxis(num11 * 57.29578f, Vector3.down);
+            frameData.m_swayVelocity = frameData.m_swayVelocity * (1f - this.m_info.m_dampers) -
+                                       vector3_14 * (1f - this.m_info.m_springs) -
+                                       frameData.m_swayPosition * this.m_info.m_springs;
+            frameData.m_swayVelocity = Vector3.ClampMagnitude(frameData.m_swayVelocity, 1f);
+            frameData.m_swayPosition += frameData.m_swayVelocity * 0.5f;
+            frameData.m_steerAngle = 0.0f;
+            frameData.m_travelDistance += vector.z;
+            frameData.m_lightIntensity.x = 5f;
+            frameData.m_lightIntensity.y = 5f;
+            frameData.m_lightIntensity.z = 5f;
+            frameData.m_lightIntensity.w = 5f;
+            base.SimulationStep(vehicleID, ref vehicleData, ref frameData, leaderID, ref leaderData, lodPhysics);
+        }
+    }
+
+    //Taken from ShipAI as it's private there
+    private void ReserveSpace(
+        ushort vehicleID,
+        ref Vehicle vehicleData,
+        ref Vehicle.Frame frameData,
+        bool moving)
+    {
+        uint num1 = vehicleData.m_path;
+        if (num1 == 0U)
+            return;
+        NetManager instance1 = Singleton<NetManager>.instance;
+        PathManager instance2 = Singleton<PathManager>.instance;
+        byte num2 = vehicleData.m_pathPositionIndex;
+        byte lastPathOffset = vehicleData.m_lastPathOffset;
+        if (num2 == byte.MaxValue)
+            num2 = (byte) 0;
+        byte num3 = (byte) ((uint) num2 >> 1);
+        PathUnit.Position position1;
+        for (int index = 0;
+            index < 2 && instance2.m_pathUnits.m_buffer[num1].GetPosition((int) num3, out position1);
+            ++index)
+        {
+            ushort startNode = instance1.m_segments.m_buffer[(int) position1.m_segment].m_startNode;
+            ushort endNode = instance1.m_segments.m_buffer[(int) position1.m_segment].m_endNode;
+            Vector3 position2 = instance1.m_nodes.m_buffer[(int) startNode].m_position;
+            Vector3 position3 = instance1.m_nodes.m_buffer[(int) endNode].m_position;
+            if ((double) Vector3.SqrMagnitude(frameData.m_position - position2) >= 90000.0 &&
+                (double) Vector3.SqrMagnitude(frameData.m_position - position3) >= 90000.0)
+                break;
+            if (index == 0)
+            {
+                instance1.m_segments.m_buffer[(int) position1.m_segment]
+                    .AddTraffic(Mathf.RoundToInt(this.m_info.m_generatedInfo.m_size.z * 3f), this.GetNoiseLevel());
+                if (((int) num3 & 1) == 0 || lastPathOffset == (byte) 0 ||
+                    (vehicleData.m_flags & Vehicle.Flags.WaitingPath) != ~(Vehicle.Flags.Created |
                                                                            Vehicle.Flags.Deleted |
                                                                            Vehicle.Flags.Spawned |
                                                                            Vehicle.Flags.Inverted |
@@ -537,208 +1201,47 @@ public class CargoFerryAI : VehicleAI
                                                                            Vehicle.Flags.Underground |
                                                                            Vehicle.Flags.Transition |
                                                                            Vehicle.Flags.InsideBuilding |
-                                                                           Vehicle.Flags.LeftHandDrive) ||
-                         (leaderData.m_flags2 & Vehicle.Flags2.Floating) == (Vehicle.Flags2) 0
-            ? 0.0f
-            : vehicleData.m_targetPos0.w;
-        Quaternion quaternion = Quaternion.Inverse(frameData.m_rotation);
-        Vector3 v2 = quaternion * v1;
-        Vector3 vector3_1 = quaternion * frameData.m_velocity;
-        Vector3 vector3_2 = Vector3.forward;
-        Vector3 zero1 = Vector3.zero;
-        Vector3 zero2 = Vector3.zero;
-        float f2 = 0.0f;
-        float num5 = 0.0f;
-        bool blocked = false;
-        float len1 = 0.0f;
-        if ((double) f1 > 1.0)
-        {
-            vector3_2 = VectorUtils.NormalizeXZ(v2, out len1);
-            if ((double) len1 > 1.0)
-            {
-                Vector3 v3 = v2;
-                float num4 = Mathf.Max(num1, 2f);
-                float num6 = num4 * num4;
-                if ((double) f1 > (double) num6)
-                    v3 *= num4 / Mathf.Sqrt(f1);
-                float len2;
-                vector3_2 = VectorUtils.NormalizeXZ(v3, out len2);
-                len1 = Mathf.Min(len1, len2);
-                float curve = (float) (1.57079637050629 * (1.0 - (double) vector3_2.z));
-                if ((double) len1 > 1.0)
-                    curve /= len1;
-                float targetDistance1 = len1;
-                float a1 = (double) vehicleData.m_targetPos0.w >= 0.100000001490116
-                    ? Mathf.Min(
-                        Mathf.Min(maxSpeed, this.CalculateTargetSpeed(vehicleID, ref vehicleData, 1000f, curve)),
-                        CargoFerryAI.CalculateMaxSpeed(targetDistance1, vehicleData.m_targetPos1.w, braking * 0.9f))
-                    : Mathf.Min(this.CalculateTargetSpeed(vehicleID, ref vehicleData, 1000f, curve),
-                        CargoFerryAI.CalculateMaxSpeed(targetDistance1,
-                            Mathf.Min(vehicleData.m_targetPos0.w, vehicleData.m_targetPos1.w), braking * 0.9f));
-                float targetDistance2 = targetDistance1 +
-                                        VectorUtils.LengthXZ((Vector3) (vehicleData.m_targetPos1 -
-                                                                        vehicleData.m_targetPos0));
-                float a2 = Mathf.Min(a1,
-                    CargoFerryAI.CalculateMaxSpeed(targetDistance2, vehicleData.m_targetPos2.w, braking * 0.9f));
-                float targetDistance3 = targetDistance2 +
-                                        VectorUtils.LengthXZ((Vector3) (vehicleData.m_targetPos2 -
-                                                                        vehicleData.m_targetPos1));
-                float a3 = Mathf.Min(a2,
-                    CargoFerryAI.CalculateMaxSpeed(targetDistance3, vehicleData.m_targetPos3.w, braking * 0.9f));
-                float targetDistance4 = targetDistance3 +
-                                        VectorUtils.LengthXZ((Vector3) (vehicleData.m_targetPos3 -
-                                                                        vehicleData.m_targetPos2));
-                if ((double) vehicleData.m_targetPos3.w < 0.00999999977648258)
-                    targetDistance4 = Mathf.Max(0.0f, targetDistance4 - this.m_info.m_generatedInfo.m_size.z * 0.5f);
-                maxSpeed = Mathf.Min(a3, CargoFerryAI.CalculateMaxSpeed(targetDistance4, 0.0f, braking * 0.9f));
-                if (!CargoFerryAI.DisableCollisionCheck(leaderID, ref leaderData))
-                    CargoFerryAI.CheckOtherVehicles(vehicleID, ref vehicleData, ref frameData, ref maxSpeed,
-                        ref blocked, ref zero2, maxDistance, braking * 0.9f, lodPhysics);
-                if ((double) maxSpeed < (double) num1)
+                                                                           Vehicle.Flags.LeftHandDrive))
                 {
-                    float num7 = Mathf.Max(acceleration, Mathf.Min(braking, num1));
-                    f2 = Mathf.Max(maxSpeed, num1 - num7);
-                }
-                else
-                {
-                    float num7 = Mathf.Max(acceleration, Mathf.Min(braking, -num1));
-                    f2 = Mathf.Min(maxSpeed, num1 + num7);
+                    if ((instance1.m_segments.m_buffer[(int) position1.m_segment].m_flags &
+                         NetSegment.Flags.Untouchable) == NetSegment.Flags.None)
+                        break;
+                    uint laneId = PathManager.GetLaneID(position1);
+                    if (laneId != 0U)
+                        instance1.m_lanes.m_buffer[laneId].ReserveSpace(1000f, vehicleID);
+                    if (!moving || (vehicleData.m_flags & Vehicle.Flags.WaitingPath) != ~(Vehicle.Flags.Created |
+                        Vehicle.Flags.Deleted | Vehicle.Flags.Spawned | Vehicle.Flags.Inverted |
+                        Vehicle.Flags.TransferToTarget | Vehicle.Flags.TransferToSource | Vehicle.Flags.Emergency1 |
+                        Vehicle.Flags.Emergency2 | Vehicle.Flags.WaitingPath | Vehicle.Flags.Stopped |
+                        Vehicle.Flags.Leaving | Vehicle.Flags.Arriving | Vehicle.Flags.Reversed |
+                        Vehicle.Flags.TakingOff | Vehicle.Flags.Flying | Vehicle.Flags.Landing |
+                        Vehicle.Flags.WaitingSpace | Vehicle.Flags.WaitingCargo | Vehicle.Flags.GoingBack |
+                        Vehicle.Flags.WaitingTarget | Vehicle.Flags.Importing | Vehicle.Flags.Exporting |
+                        Vehicle.Flags.Parking | Vehicle.Flags.CustomName | Vehicle.Flags.OnGravel |
+                        Vehicle.Flags.WaitingLoading | Vehicle.Flags.Congestion | Vehicle.Flags.DummyTraffic |
+                        Vehicle.Flags.Underground | Vehicle.Flags.Transition | Vehicle.Flags.InsideBuilding |
+                        Vehicle.Flags.LeftHandDrive))
+                        break;
                 }
             }
-        }
-        else if ((double) num1 < (double) this.SlowDownThreshold(ref vehicleData) && flag1 &&
-                 this.ArriveAtDestination(leaderID, ref leaderData))
-        {
-            leaderData.Unspawn(leaderID);
-            if ((int) leaderID != (int) vehicleID)
-                return;
-            frameData = leaderData.m_frame0;
-            return;
-        }
+            else
+            {
+                if ((instance1.m_segments.m_buffer[(int) position1.m_segment].m_flags & NetSegment.Flags.Untouchable) ==
+                    NetSegment.Flags.None)
+                    break;
+                uint laneId = PathManager.GetLaneID(position1);
+                if (laneId != 0U && !instance1.m_lanes.m_buffer[laneId].ReserveSpace(1000f, vehicleID) || !moving)
+                    break;
+            }
 
-        if ((leaderData.m_flags & Vehicle.Flags.Stopped) == ~(Vehicle.Flags.Created | Vehicle.Flags.Deleted |
-                                                              Vehicle.Flags.Spawned | Vehicle.Flags.Inverted |
-                                                              Vehicle.Flags.TransferToTarget |
-                                                              Vehicle.Flags.TransferToSource |
-                                                              Vehicle.Flags.Emergency1 | Vehicle.Flags.Emergency2 |
-                                                              Vehicle.Flags.WaitingPath | Vehicle.Flags.Stopped |
-                                                              Vehicle.Flags.Leaving | Vehicle.Flags.Arriving |
-                                                              Vehicle.Flags.Reversed | Vehicle.Flags.TakingOff |
-                                                              Vehicle.Flags.Flying | Vehicle.Flags.Landing |
-                                                              Vehicle.Flags.WaitingSpace | Vehicle.Flags.WaitingCargo |
-                                                              Vehicle.Flags.GoingBack | Vehicle.Flags.WaitingTarget |
-                                                              Vehicle.Flags.Importing | Vehicle.Flags.Exporting |
-                                                              Vehicle.Flags.Parking | Vehicle.Flags.CustomName |
-                                                              Vehicle.Flags.OnGravel | Vehicle.Flags.WaitingLoading |
-                                                              Vehicle.Flags.Congestion | Vehicle.Flags.DummyTraffic |
-                                                              Vehicle.Flags.Underground | Vehicle.Flags.Transition |
-                                                              Vehicle.Flags.InsideBuilding |
-                                                              Vehicle.Flags.LeftHandDrive) &&
-            (double) maxSpeed < 0.100000001490116)
-            blocked = true;
-        vehicleData.m_blockCounter =
-            !blocked ? (byte) 0 : (byte) Mathf.Min((int) vehicleData.m_blockCounter + 1, (int) byte.MaxValue);
-        Vector3 vector3_3;
-        if ((double) len1 > 1.0)
-        {
-            num5 = Mathf.Asin(vector3_2.x) * Mathf.Sign(f2);
-            vector3_3 = vector3_2 * f2;
+            if ((int) ++num3 >= (int) instance2.m_pathUnits.m_buffer[num1].m_positionCount)
+            {
+                num1 = instance2.m_pathUnits.m_buffer[num1].m_nextPathUnit;
+                num3 = (byte) 0;
+                if (num1 == 0U)
+                    break;
+            }
         }
-        else
-        {
-            f2 = 0.0f;
-            Vector3 vector = v2 * 0.5f - vector3_1;
-            vector.y = 0.0f;
-            Vector3 vector3_4 = Vector3.ClampMagnitude(vector, braking);
-            vector3_3 = vector3_1 + vector3_4;
-        }
-
-        bool flag2 = ((int) currentFrameIndex + (int) leaderID & 16) != 0;
-        Vector3 vector3_5 = vector3_3 - vector3_1;
-        vector3_5.y = 0.0f;
-        Vector3 forward1 = frameData.m_rotation * vector3_3;
-        bool hasWater;
-        forward1.y =
-            Singleton<TerrainManager>.instance.SampleBlockHeightSmoothWithWater(
-                frameData.m_position + frameData.m_velocity, false, 0.0f, out hasWater) - frameData.m_position.y;
-        if (hasWater)
-            leaderData.m_flags2 |= Vehicle.Flags2.Floating;
-        else
-            leaderData.m_flags2 &= ~Vehicle.Flags2.Floating;
-        frameData.m_velocity = forward1 + zero2;
-        frameData.m_position += frameData.m_velocity * 0.5f;
-        frameData.m_swayVelocity = frameData.m_swayVelocity * (1f - this.m_info.m_dampers) -
-                                   vector3_5 * (1f - this.m_info.m_springs) -
-                                   frameData.m_swayPosition * this.m_info.m_springs;
-        frameData.m_swayPosition += frameData.m_swayVelocity * 0.5f;
-        frameData.m_steerAngle = num5;
-        frameData.m_travelDistance += vector3_3.z;
-        frameData.m_lightIntensity.x = 5f;
-        frameData.m_lightIntensity.y = (double) vector3_5.z >= -0.100000001490116 ? 0.5f : 5f;
-        frameData.m_lightIntensity.z = (double) num5 >= -0.100000001490116 || !flag2 ? 0.0f : 5f;
-        frameData.m_lightIntensity.w = (double) num5 <= 0.100000001490116 || !flag2 ? 0.0f : 5f;
-        frameData.m_underground = (vehicleData.m_flags & Vehicle.Flags.Underground) != ~(Vehicle.Flags.Created |
-            Vehicle.Flags.Deleted | Vehicle.Flags.Spawned | Vehicle.Flags.Inverted | Vehicle.Flags.TransferToTarget |
-            Vehicle.Flags.TransferToSource | Vehicle.Flags.Emergency1 | Vehicle.Flags.Emergency2 |
-            Vehicle.Flags.WaitingPath | Vehicle.Flags.Stopped | Vehicle.Flags.Leaving | Vehicle.Flags.Arriving |
-            Vehicle.Flags.Reversed | Vehicle.Flags.TakingOff | Vehicle.Flags.Flying | Vehicle.Flags.Landing |
-            Vehicle.Flags.WaitingSpace | Vehicle.Flags.WaitingCargo | Vehicle.Flags.GoingBack |
-            Vehicle.Flags.WaitingTarget | Vehicle.Flags.Importing | Vehicle.Flags.Exporting | Vehicle.Flags.Parking |
-            Vehicle.Flags.CustomName | Vehicle.Flags.OnGravel | Vehicle.Flags.WaitingLoading |
-            Vehicle.Flags.Congestion | Vehicle.Flags.DummyTraffic | Vehicle.Flags.Underground |
-            Vehicle.Flags.Transition | Vehicle.Flags.InsideBuilding | Vehicle.Flags.LeftHandDrive);
-        frameData.m_transition = (vehicleData.m_flags & Vehicle.Flags.Transition) != ~(Vehicle.Flags.Created |
-            Vehicle.Flags.Deleted | Vehicle.Flags.Spawned | Vehicle.Flags.Inverted | Vehicle.Flags.TransferToTarget |
-            Vehicle.Flags.TransferToSource | Vehicle.Flags.Emergency1 | Vehicle.Flags.Emergency2 |
-            Vehicle.Flags.WaitingPath | Vehicle.Flags.Stopped | Vehicle.Flags.Leaving | Vehicle.Flags.Arriving |
-            Vehicle.Flags.Reversed | Vehicle.Flags.TakingOff | Vehicle.Flags.Flying | Vehicle.Flags.Landing |
-            Vehicle.Flags.WaitingSpace | Vehicle.Flags.WaitingCargo | Vehicle.Flags.GoingBack |
-            Vehicle.Flags.WaitingTarget | Vehicle.Flags.Importing | Vehicle.Flags.Exporting | Vehicle.Flags.Parking |
-            Vehicle.Flags.CustomName | Vehicle.Flags.OnGravel | Vehicle.Flags.WaitingLoading |
-            Vehicle.Flags.Congestion | Vehicle.Flags.DummyTraffic | Vehicle.Flags.Underground |
-            Vehicle.Flags.Transition | Vehicle.Flags.InsideBuilding | Vehicle.Flags.LeftHandDrive);
-        if ((vehicleData.m_flags & Vehicle.Flags.Parking) != ~(Vehicle.Flags.Created | Vehicle.Flags.Deleted |
-                                                               Vehicle.Flags.Spawned | Vehicle.Flags.Inverted |
-                                                               Vehicle.Flags.TransferToTarget |
-                                                               Vehicle.Flags.TransferToSource |
-                                                               Vehicle.Flags.Emergency1 | Vehicle.Flags.Emergency2 |
-                                                               Vehicle.Flags.WaitingPath | Vehicle.Flags.Stopped |
-                                                               Vehicle.Flags.Leaving | Vehicle.Flags.Arriving |
-                                                               Vehicle.Flags.Reversed | Vehicle.Flags.TakingOff |
-                                                               Vehicle.Flags.Flying | Vehicle.Flags.Landing |
-                                                               Vehicle.Flags.WaitingSpace | Vehicle.Flags.WaitingCargo |
-                                                               Vehicle.Flags.GoingBack | Vehicle.Flags.WaitingTarget |
-                                                               Vehicle.Flags.Importing | Vehicle.Flags.Exporting |
-                                                               Vehicle.Flags.Parking | Vehicle.Flags.CustomName |
-                                                               Vehicle.Flags.OnGravel | Vehicle.Flags.WaitingLoading |
-                                                               Vehicle.Flags.Congestion | Vehicle.Flags.DummyTraffic |
-                                                               Vehicle.Flags.Underground | Vehicle.Flags.Transition |
-                                                               Vehicle.Flags.InsideBuilding |
-                                                               Vehicle.Flags.LeftHandDrive) && (double) len1 <= 1.0 &&
-            flag1)
-        {
-            Vector3 forward2 = (Vector3) (vehicleData.m_targetPos1 - vehicleData.m_targetPos0);
-            forward2.y = 0.0f;
-            if ((double) forward2.sqrMagnitude > 0.00999999977648258)
-                frameData.m_rotation =
-                    Quaternion.RotateTowards(frameData.m_rotation, Quaternion.LookRotation(forward2), 15f);
-        }
-        else if ((double) f2 > 0.100000001490116)
-        {
-            forward1.y = 0.0f;
-            if ((double) forward1.sqrMagnitude > 0.00999999977648258)
-                frameData.m_rotation =
-                    Quaternion.RotateTowards(frameData.m_rotation, Quaternion.LookRotation(forward1), 15f);
-        }
-        else if ((double) f2 < -0.100000001490116)
-        {
-            forward1.y = 0.0f;
-            if ((double) forward1.sqrMagnitude > 0.00999999977648258)
-                frameData.m_rotation =
-                    Quaternion.RotateTowards(frameData.m_rotation, Quaternion.LookRotation(-forward1), 15f);
-        }
-
-        base.SimulationStep(vehicleID, ref vehicleData, ref frameData, leaderID, ref leaderData, lodPhysics);
     }
 
     private static bool DisableCollisionCheck(ushort vehicleID, ref Vehicle vehicleData) =>
@@ -789,7 +1292,8 @@ public class CargoFerryAI : VehicleAI
         vehicleData.m_segment.b = vector3_1 + vector3_2;
     }
 
-    public static void CheckOtherVehicles(
+    //changed from static to instance
+    public void CheckOtherVehicles(
         ushort vehicleID,
         ref Vehicle vehicleData,
         ref Vehicle.Frame frameData,
@@ -1644,6 +2148,8 @@ public class CargoFerryAI : VehicleAI
         return otherData.m_nextGridVehicle;
     }
 
+    
+    //this method is the same in both FerryAI and ShipAI
     private static float CalculateMaxSpeed(float targetDistance, float targetSpeed, float maxBraking)
     {
         float num1 = 0.5f * maxBraking;
