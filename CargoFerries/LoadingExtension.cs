@@ -20,7 +20,6 @@ namespace CargoFerries
             VehicleInfoPatch.Apply();
             CargoTruckVehicleTypePatch.Apply();
             BuildingInfoPatch.Apply();
-            FerryAIDisableCollisionCheckPatch.Apply();
             CargoTruckAIChangeVehicleTypePatch.Apply(); //TODO: check SVS2 is not enabled
         }
 
@@ -83,7 +82,6 @@ namespace CargoFerries
             VehicleInfoPatch.Undo();
             CargoTruckVehicleTypePatch.Undo();
             BuildingInfoPatch.Undo();
-            FerryAIDisableCollisionCheckPatch.Undo();
             CargoTruckAIChangeVehicleTypePatch.Undo();
             ItemClasses.Unregister();
         }
