@@ -73,7 +73,7 @@ namespace CargoFerries.HarmonyPatches
                 ;
                 newCodes.Add(newInstruction);
                 Debug.LogWarning(
-                    $"SVS2: Replaced vehicle type with {newInstruction.operand}");
+                    $"MCM: Replaced vehicle type with {newInstruction.operand}");
             }
 
             return newCodes.AsEnumerable();

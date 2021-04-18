@@ -135,6 +135,7 @@ public class CargoFerryAI : CargoShipAI
     public override void CreateVehicle(ushort vehicleID, ref Vehicle data)
     {
         base.CreateVehicle(vehicleID, ref data);
+        UnityEngine.Debug.Log($"Create vehicle {vehicleID}");
         bool hasWater;
         data.m_frame0.m_position.y =
             Singleton<TerrainManager>.instance.SampleBlockHeightSmoothWithWater(data.m_frame0.m_position, false, 0.0f,
@@ -147,10 +148,163 @@ public class CargoFerryAI : CargoShipAI
         data.m_flags2 |= Vehicle.Flags2.Floating;
     }
 
-    public override void ReleaseVehicle(ushort vehicleID, ref Vehicle data) => base.ReleaseVehicle(vehicleID, ref data);
+    public override void ReleaseVehicle(ushort vehicleID, ref Vehicle data)
+    {
+        UnityEngine.Debug.Log($"ReleaseVehicle {vehicleID}");
+        base.ReleaseVehicle(vehicleID, ref data);
+    }
 
     public override void SimulationStep(ushort vehicleID, ref Vehicle data, Vector3 physicsLodRefPos)
     {
+        UnityEngine.Debug.Log($"SimulationStep 1 {vehicleID}");
+        //the first part is from CargoShipAI
+            if ((data.m_flags & Vehicle.Flags.WaitingCargo) != ~(Vehicle.Flags.Created | Vehicle.Flags.Deleted | Vehicle.Flags.Spawned | Vehicle.Flags.Inverted | Vehicle.Flags.TransferToTarget | Vehicle.Flags.TransferToSource | Vehicle.Flags.Emergency1 | Vehicle.Flags.Emergency2 | Vehicle.Flags.WaitingPath | Vehicle.Flags.Stopped | Vehicle.Flags.Leaving | Vehicle.Flags.Arriving | Vehicle.Flags.Reversed | Vehicle.Flags.TakingOff | Vehicle.Flags.Flying | Vehicle.Flags.Landing | Vehicle.Flags.WaitingSpace | Vehicle.Flags.WaitingCargo | Vehicle.Flags.GoingBack | Vehicle.Flags.WaitingTarget | Vehicle.Flags.Importing | Vehicle.Flags.Exporting | Vehicle.Flags.Parking | Vehicle.Flags.CustomName | Vehicle.Flags.OnGravel | Vehicle.Flags.WaitingLoading | Vehicle.Flags.Congestion | Vehicle.Flags.DummyTraffic | Vehicle.Flags.Underground | Vehicle.Flags.Transition | Vehicle.Flags.InsideBuilding | Vehicle.Flags.LeftHandDrive))
+            {
+                bool flag = Singleton<SimulationManager>.instance.m_randomizer.Int32(2U) == 0;
+                if (!flag && data.m_sourceBuilding != (ushort) 0 &&
+                    (Singleton<BuildingManager>.instance.m_buildings.m_buffer[(int) data.m_sourceBuilding].m_flags &
+                     Building.Flags.Active) == Building.Flags.None)
+                    flag = true;
+                if (!flag && data.m_targetBuilding != (ushort) 0 &&
+                    (Singleton<BuildingManager>.instance.m_buildings.m_buffer[(int) data.m_targetBuilding].m_flags &
+                     Building.Flags.Active) == Building.Flags.None)
+                    flag = true;
+                if (!flag)
+                {
+                    data.m_waitCounter = (int) data.m_transferSize < this.m_cargoCapacity
+                        ? (byte) Mathf.Min((int) data.m_waitCounter + 1, (int) byte.MaxValue)
+                        : byte.MaxValue;
+                    if (data.m_waitCounter == byte.MaxValue && ((data.m_flags & Vehicle.Flags.Spawned) !=
+                                                                ~(Vehicle.Flags.Created | Vehicle.Flags.Deleted |
+                                                                  Vehicle.Flags.Spawned |
+                                                                  Vehicle.Flags.Inverted |
+                                                                  Vehicle.Flags.TransferToTarget |
+                                                                  Vehicle.Flags.TransferToSource |
+                                                                  Vehicle.Flags.Emergency1 | Vehicle.Flags.Emergency2 |
+                                                                  Vehicle.Flags.WaitingPath |
+                                                                  Vehicle.Flags.Stopped | Vehicle.Flags.Leaving |
+                                                                  Vehicle.Flags.Arriving |
+                                                                  Vehicle.Flags.Reversed | Vehicle.Flags.TakingOff |
+                                                                  Vehicle.Flags.Flying |
+                                                                  Vehicle.Flags.Landing | Vehicle.Flags.WaitingSpace |
+                                                                  Vehicle.Flags.WaitingCargo |
+                                                                  Vehicle.Flags.GoingBack |
+                                                                  Vehicle.Flags.WaitingTarget |
+                                                                  Vehicle.Flags.Importing |
+                                                                  Vehicle.Flags.Exporting | Vehicle.Flags.Parking |
+                                                                  Vehicle.Flags.CustomName |
+                                                                  Vehicle.Flags.OnGravel |
+                                                                  Vehicle.Flags.WaitingLoading |
+                                                                  Vehicle.Flags.Congestion |
+                                                                  Vehicle.Flags.DummyTraffic |
+                                                                  Vehicle.Flags.Underground | Vehicle.Flags.Transition |
+                                                                  Vehicle.Flags.InsideBuilding |
+                                                                  Vehicle.Flags.LeftHandDrive) ||
+                                                                this.CanSpawnAt(data.GetLastFramePosition())))
+                    {
+                        data.m_flags &= Vehicle.Flags.Created | Vehicle.Flags.Deleted | Vehicle.Flags.Spawned |
+                                        Vehicle.Flags.Inverted | Vehicle.Flags.TransferToTarget |
+                                        Vehicle.Flags.TransferToSource | Vehicle.Flags.Emergency1 |
+                                        Vehicle.Flags.Emergency2 | Vehicle.Flags.WaitingPath | Vehicle.Flags.Stopped |
+                                        Vehicle.Flags.Leaving | Vehicle.Flags.Arriving | Vehicle.Flags.Reversed |
+                                        Vehicle.Flags.TakingOff | Vehicle.Flags.Flying | Vehicle.Flags.Landing |
+                                        Vehicle.Flags.WaitingSpace | Vehicle.Flags.GoingBack |
+                                        Vehicle.Flags.WaitingTarget | Vehicle.Flags.Importing |
+                                        Vehicle.Flags.Exporting | Vehicle.Flags.Parking | Vehicle.Flags.CustomName |
+                                        Vehicle.Flags.OnGravel | Vehicle.Flags.WaitingLoading |
+                                        Vehicle.Flags.Congestion | Vehicle.Flags.DummyTraffic |
+                                        Vehicle.Flags.Underground | Vehicle.Flags.Transition |
+                                        Vehicle.Flags.InsideBuilding | Vehicle.Flags.LeftHandDrive;
+                        data.m_flags |= Vehicle.Flags.Leaving;
+                        data.m_waitCounter = (byte) 0;
+                        this.StartPathFind(vehicleID, ref data);
+                    }
+                }
+            }
+            else if ((data.m_flags & Vehicle.Flags.Stopped) != ~(Vehicle.Flags.Created | Vehicle.Flags.Deleted |
+                                                                 Vehicle.Flags.Spawned | Vehicle.Flags.Inverted |
+                                                                 Vehicle.Flags.TransferToTarget |
+                                                                 Vehicle.Flags.TransferToSource |
+                                                                 Vehicle.Flags.Emergency1 | Vehicle.Flags.Emergency2 |
+                                                                 Vehicle.Flags.WaitingPath | Vehicle.Flags.Stopped |
+                                                                 Vehicle.Flags.Leaving | Vehicle.Flags.Arriving |
+                                                                 Vehicle.Flags.Reversed | Vehicle.Flags.TakingOff |
+                                                                 Vehicle.Flags.Flying | Vehicle.Flags.Landing |
+                                                                 Vehicle.Flags.WaitingSpace |
+                                                                 Vehicle.Flags.WaitingCargo | Vehicle.Flags.GoingBack |
+                                                                 Vehicle.Flags.WaitingTarget | Vehicle.Flags.Importing |
+                                                                 Vehicle.Flags.Exporting | Vehicle.Flags.Parking |
+                                                                 Vehicle.Flags.CustomName | Vehicle.Flags.OnGravel |
+                                                                 Vehicle.Flags.WaitingLoading |
+                                                                 Vehicle.Flags.Congestion | Vehicle.Flags.DummyTraffic |
+                                                                 Vehicle.Flags.Underground | Vehicle.Flags.Transition |
+                                                                 Vehicle.Flags.InsideBuilding |
+                                                                 Vehicle.Flags.LeftHandDrive))
+            {
+                if ((data.m_flags & Vehicle.Flags.Spawned) != ~(Vehicle.Flags.Created | Vehicle.Flags.Deleted |
+                                                                Vehicle.Flags.Spawned | Vehicle.Flags.Inverted |
+                                                                Vehicle.Flags.TransferToTarget |
+                                                                Vehicle.Flags.TransferToSource |
+                                                                Vehicle.Flags.Emergency1 | Vehicle.Flags.Emergency2 |
+                                                                Vehicle.Flags.WaitingPath | Vehicle.Flags.Stopped |
+                                                                Vehicle.Flags.Leaving | Vehicle.Flags.Arriving |
+                                                                Vehicle.Flags.Reversed | Vehicle.Flags.TakingOff |
+                                                                Vehicle.Flags.Flying | Vehicle.Flags.Landing |
+                                                                Vehicle.Flags.WaitingSpace |
+                                                                Vehicle.Flags.WaitingCargo | Vehicle.Flags.GoingBack |
+                                                                Vehicle.Flags.WaitingTarget | Vehicle.Flags.Importing |
+                                                                Vehicle.Flags.Exporting | Vehicle.Flags.Parking |
+                                                                Vehicle.Flags.CustomName | Vehicle.Flags.OnGravel |
+                                                                Vehicle.Flags.WaitingLoading |
+                                                                Vehicle.Flags.Congestion | Vehicle.Flags.DummyTraffic |
+                                                                Vehicle.Flags.Underground | Vehicle.Flags.Transition |
+                                                                Vehicle.Flags.InsideBuilding |
+                                                                Vehicle.Flags.LeftHandDrive) &&
+                    ++data.m_waitCounter == (byte) 16)
+                {
+                    data.m_flags &= Vehicle.Flags.Created | Vehicle.Flags.Deleted | Vehicle.Flags.Spawned |
+                                    Vehicle.Flags.Inverted | Vehicle.Flags.TransferToTarget |
+                                    Vehicle.Flags.TransferToSource | Vehicle.Flags.Emergency1 |
+                                    Vehicle.Flags.Emergency2 | Vehicle.Flags.WaitingPath | Vehicle.Flags.Leaving |
+                                    Vehicle.Flags.Arriving | Vehicle.Flags.Reversed | Vehicle.Flags.TakingOff |
+                                    Vehicle.Flags.Flying | Vehicle.Flags.Landing | Vehicle.Flags.WaitingSpace |
+                                    Vehicle.Flags.WaitingCargo | Vehicle.Flags.GoingBack | Vehicle.Flags.WaitingTarget |
+                                    Vehicle.Flags.Importing | Vehicle.Flags.Exporting | Vehicle.Flags.Parking |
+                                    Vehicle.Flags.CustomName | Vehicle.Flags.OnGravel | Vehicle.Flags.Congestion |
+                                    Vehicle.Flags.DummyTraffic | Vehicle.Flags.Underground | Vehicle.Flags.Transition |
+                                    Vehicle.Flags.InsideBuilding | Vehicle.Flags.LeftHandDrive;
+                    data.m_flags |= Vehicle.Flags.Leaving;
+                    data.m_waitCounter = (byte) 0;
+                }
+            }
+            else if ((data.m_flags & Vehicle.Flags.GoingBack) == ~(Vehicle.Flags.Created | Vehicle.Flags.Deleted |
+                                                                   Vehicle.Flags.Spawned | Vehicle.Flags.Inverted |
+                                                                   Vehicle.Flags.TransferToTarget |
+                                                                   Vehicle.Flags.TransferToSource |
+                                                                   Vehicle.Flags.Emergency1 | Vehicle.Flags.Emergency2 |
+                                                                   Vehicle.Flags.WaitingPath | Vehicle.Flags.Stopped |
+                                                                   Vehicle.Flags.Leaving | Vehicle.Flags.Arriving |
+                                                                   Vehicle.Flags.Reversed | Vehicle.Flags.TakingOff |
+                                                                   Vehicle.Flags.Flying | Vehicle.Flags.Landing |
+                                                                   Vehicle.Flags.WaitingSpace |
+                                                                   Vehicle.Flags.WaitingCargo |
+                                                                   Vehicle.Flags.GoingBack |
+                                                                   Vehicle.Flags.WaitingTarget |
+                                                                   Vehicle.Flags.Importing | Vehicle.Flags.Exporting |
+                                                                   Vehicle.Flags.Parking | Vehicle.Flags.CustomName |
+                                                                   Vehicle.Flags.OnGravel |
+                                                                   Vehicle.Flags.WaitingLoading |
+                                                                   Vehicle.Flags.Congestion |
+                                                                   Vehicle.Flags.DummyTraffic |
+                                                                   Vehicle.Flags.Underground |
+                                                                   Vehicle.Flags.Transition |
+                                                                   Vehicle.Flags.InsideBuilding |
+                                                                   Vehicle.Flags.LeftHandDrive) &&
+                     data.m_targetBuilding != (ushort) 0 &&
+                     (Singleton<BuildingManager>.instance.m_buildings.m_buffer[(int) data.m_targetBuilding].m_flags &
+                      Building.Flags.Active) == Building.Flags.None)
+                this.SetTarget(vehicleID, ref data, (ushort) 0);
+        //the part below is from ShipAI
         if ((data.m_flags & Vehicle.Flags.WaitingPath) != ~(Vehicle.Flags.Created | Vehicle.Flags.Deleted |
                                                             Vehicle.Flags.Spawned | Vehicle.Flags.Inverted |
                                                             Vehicle.Flags.TransferToTarget |
@@ -214,6 +368,7 @@ public class CargoFerryAI : CargoShipAI
                 Singleton<PathManager>.instance.ReleasePath(data.m_path);
                 data.m_path = 0U;
                 this.PathfindFailure(vehicleID, ref data);
+                UnityEngine.Debug.Log($"SimulationStep 1 {vehicleID} return 1");
                 return;
             }
         }
@@ -289,16 +444,27 @@ public class CargoFerryAI : CargoShipAI
         else
         {
             if ((int) data.m_blockCounter != num1)
+            {
+                UnityEngine.Debug.Log($"SimulationStep 1 {vehicleID} return 2");
                 return;
+            }
+
             Singleton<VehicleManager>.instance.ReleaseVehicle(vehicleID);
         }
     }
+    
+    //default for VehicleAI, as it's not overridden in FerryAI (but overridden in ShipAI)
+    public override bool CanSpawnAt(Vector3 pos) => true;
 
     protected virtual void PathfindSuccess(ushort vehicleID, ref Vehicle data)
     {
     }
 
-    protected virtual void PathfindFailure(ushort vehicleID, ref Vehicle data) => data.Unspawn(vehicleID);
+    protected virtual void PathfindFailure(ushort vehicleID, ref Vehicle data)
+    {
+        UnityEngine.Debug.Log($"Pathfind failure: {vehicleID}");
+        data.Unspawn(vehicleID);
+    }
 
     protected virtual float SlowDownThreshold(ref Vehicle vehicleData) => 0.1f;
 
@@ -310,6 +476,7 @@ public class CargoFerryAI : CargoShipAI
         ref Vehicle leaderData,
         int lodPhysics)
     {
+        UnityEngine.Debug.Log($"SimulationStep 2 {vehicleID}");
         if ((VehicleManager.instance.m_vehicles.m_buffer[vehicleID].m_flags & Vehicle.Flags.Arriving) ==
             ~(Vehicle.Flags.Created | Vehicle.Flags.Deleted | Vehicle.Flags.Spawned | Vehicle.Flags.Inverted |
               Vehicle.Flags.TransferToTarget | Vehicle.Flags.TransferToSource | Vehicle.Flags.Emergency1 |
@@ -623,6 +790,7 @@ public class CargoFerryAI : CargoShipAI
             else if ((double) num1 < (double) this.SlowDownThreshold(ref vehicleData) && flag1 &&
                      this.ArriveAtDestination(leaderID, ref leaderData))
             {
+                UnityEngine.Debug.Log($"leader unspawn: {vehicleID}, leader={leaderID}");
                 leaderData.Unspawn(leaderID);
                 if ((int) leaderID != (int) vehicleID)
                     return;
@@ -2243,6 +2411,7 @@ public class CargoFerryAI : CargoShipAI
         Vector3 startPos,
         Vector3 endPos)
     {
+        UnityEngine.Debug.Log($"StartPathFind 1 {vehicleID}");
         return this.StartPathFind(vehicleID, ref vehicleData, startPos, endPos, true, true, false);
     }
 
@@ -2255,6 +2424,7 @@ public class CargoFerryAI : CargoShipAI
         bool endBothWays,
         bool undergroundTarget)
     {
+        UnityEngine.Debug.Log($"StartPathFind 2 {vehicleID}");
         VehicleInfo info = this.m_info;
         PathUnit.Position pathPosA1;
         PathUnit.Position pathPosB1;
@@ -2324,6 +2494,7 @@ public class CargoFerryAI : CargoShipAI
 
     public override bool TrySpawn(ushort vehicleID, ref Vehicle vehicleData)
     {
+        UnityEngine.Debug.Log($"TrySpawn {vehicleID}");
         if ((vehicleData.m_flags & Vehicle.Flags.Spawned) != ~(Vehicle.Flags.Created | Vehicle.Flags.Deleted |
                                                                Vehicle.Flags.Spawned | Vehicle.Flags.Inverted |
                                                                Vehicle.Flags.TransferToTarget |

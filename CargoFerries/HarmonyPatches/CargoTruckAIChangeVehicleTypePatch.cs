@@ -73,6 +73,7 @@ namespace CargoFerries.HarmonyPatches
 
             var vehicleInfo = instance.GetRandomVehicleInfo(
                 ref Singleton<SimulationManager>.instance.m_randomizer, service, subService, level);
+            UnityEngine.Debug.Log("Got vehicle: " + vehicleInfo.name);
             if (vehicleInfo == null && infoFrom?.m_class?.name == ItemClasses.cargoFerryFacility.name)
             {
                 UnityEngine.Debug.LogWarning("No Cargo Ferries found!");
