@@ -150,6 +150,19 @@ public class CargoFerryAI : FerryAI
       base.SimulationStep(vehicleID, ref data, physicsLodRefPos);
     }
     
+    
+    public override void UpdateBuildingTargetPositions(
+      ushort vehicleID,
+      ref Vehicle vehicleData,
+      Vector3 refPos,
+      ushort leaderID,
+      ref Vehicle leaderData,
+      ref int index,
+      float minSqrDistance)
+    {
+        //do nothing
+    }
+    
     public override void ReleaseVehicle(ushort vehicleID, ref Vehicle data)
     {
       this.RemoveSource(vehicleID, ref data);
