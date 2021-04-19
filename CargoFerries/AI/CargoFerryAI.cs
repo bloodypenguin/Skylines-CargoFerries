@@ -6,8 +6,6 @@ using UnityEngine;
 //based of FerryAI + parts from CargoShipAI
 public class CargoFerryAI : FerryAI
 {
-    [NonSerialized] private RenderGroup.MeshData m_underwaterMeshData;
-    
     [CustomizableProperty("Cargo capacity")]
     public int m_cargoCapacity = 1;
     
@@ -41,6 +39,46 @@ public class CargoFerryAI : FerryAI
         return;
       data.m_flags &= Vehicle.Flags.Created | Vehicle.Flags.Deleted | Vehicle.Flags.Spawned | Vehicle.Flags.Inverted | Vehicle.Flags.TransferToTarget | Vehicle.Flags.TransferToSource | Vehicle.Flags.Emergency1 | Vehicle.Flags.Emergency2 | Vehicle.Flags.Stopped | Vehicle.Flags.Leaving | Vehicle.Flags.Arriving | Vehicle.Flags.Reversed | Vehicle.Flags.TakingOff | Vehicle.Flags.Flying | Vehicle.Flags.Landing | Vehicle.Flags.WaitingSpace | Vehicle.Flags.WaitingCargo | Vehicle.Flags.GoingBack | Vehicle.Flags.WaitingTarget | Vehicle.Flags.Importing | Vehicle.Flags.Exporting | Vehicle.Flags.Parking | Vehicle.Flags.CustomName | Vehicle.Flags.OnGravel | Vehicle.Flags.WaitingLoading | Vehicle.Flags.Congestion | Vehicle.Flags.DummyTraffic | Vehicle.Flags.Underground | Vehicle.Flags.Transition | Vehicle.Flags.InsideBuilding | Vehicle.Flags.LeftHandDrive;
     }
+    
+      public override void SetSource(ushort vehicleID, ref Vehicle data, ushort sourceBuilding)
+  {
+    this.RemoveSource(vehicleID, ref data);
+    data.m_sourceBuilding = sourceBuilding;
+    if (sourceBuilding == (ushort) 0)
+      return;
+    data.Unspawn(vehicleID);
+    BuildingManager instance = Singleton<BuildingManager>.instance;
+    Vector3 position;
+    Vector3 target;
+    instance.m_buildings.m_buffer[(int) sourceBuilding].Info.m_buildingAI.CalculateSpawnPosition(sourceBuilding, ref instance.m_buildings.m_buffer[(int) sourceBuilding], ref Singleton<SimulationManager>.instance.m_randomizer, this.m_info, out position, out target);
+    Quaternion rotation = Quaternion.identity;
+    Vector3 forward = target - position;
+    if ((double) forward.sqrMagnitude > 0.00999999977648258)
+      rotation = Quaternion.LookRotation(forward);
+    data.m_frame0 = new Vehicle.Frame(position, rotation);
+    data.m_frame1 = data.m_frame0;
+    data.m_frame2 = data.m_frame0;
+    data.m_frame3 = data.m_frame0;
+    data.m_targetPos0 = (Vector4) (position + Vector3.ClampMagnitude(target - position, 0.5f));
+    data.m_targetPos0.w = 2f;
+    data.m_targetPos1 = data.m_targetPos0;
+    data.m_targetPos2 = data.m_targetPos0;
+    data.m_targetPos3 = data.m_targetPos0;
+    this.FrameDataUpdated(vehicleID, ref data, ref data.m_frame0);
+    Singleton<BuildingManager>.instance.m_buildings.m_buffer[(int) sourceBuilding].AddOwnVehicle(vehicleID, ref data);
+    if ((Singleton<BuildingManager>.instance.m_buildings.m_buffer[(int) sourceBuilding].m_flags & Building.Flags.IncomingOutgoing) == Building.Flags.None)
+      return;
+    if ((data.m_flags & Vehicle.Flags.TransferToTarget) != ~(Vehicle.Flags.Created | Vehicle.Flags.Deleted | Vehicle.Flags.Spawned | Vehicle.Flags.Inverted | Vehicle.Flags.TransferToTarget | Vehicle.Flags.TransferToSource | Vehicle.Flags.Emergency1 | Vehicle.Flags.Emergency2 | Vehicle.Flags.WaitingPath | Vehicle.Flags.Stopped | Vehicle.Flags.Leaving | Vehicle.Flags.Arriving | Vehicle.Flags.Reversed | Vehicle.Flags.TakingOff | Vehicle.Flags.Flying | Vehicle.Flags.Landing | Vehicle.Flags.WaitingSpace | Vehicle.Flags.WaitingCargo | Vehicle.Flags.GoingBack | Vehicle.Flags.WaitingTarget | Vehicle.Flags.Importing | Vehicle.Flags.Exporting | Vehicle.Flags.Parking | Vehicle.Flags.CustomName | Vehicle.Flags.OnGravel | Vehicle.Flags.WaitingLoading | Vehicle.Flags.Congestion | Vehicle.Flags.DummyTraffic | Vehicle.Flags.Underground | Vehicle.Flags.Transition | Vehicle.Flags.InsideBuilding | Vehicle.Flags.LeftHandDrive))
+    {
+      data.m_flags |= Vehicle.Flags.Importing;
+    }
+    else
+    {
+      if ((data.m_flags & Vehicle.Flags.TransferToSource) == ~(Vehicle.Flags.Created | Vehicle.Flags.Deleted | Vehicle.Flags.Spawned | Vehicle.Flags.Inverted | Vehicle.Flags.TransferToTarget | Vehicle.Flags.TransferToSource | Vehicle.Flags.Emergency1 | Vehicle.Flags.Emergency2 | Vehicle.Flags.WaitingPath | Vehicle.Flags.Stopped | Vehicle.Flags.Leaving | Vehicle.Flags.Arriving | Vehicle.Flags.Reversed | Vehicle.Flags.TakingOff | Vehicle.Flags.Flying | Vehicle.Flags.Landing | Vehicle.Flags.WaitingSpace | Vehicle.Flags.WaitingCargo | Vehicle.Flags.GoingBack | Vehicle.Flags.WaitingTarget | Vehicle.Flags.Importing | Vehicle.Flags.Exporting | Vehicle.Flags.Parking | Vehicle.Flags.CustomName | Vehicle.Flags.OnGravel | Vehicle.Flags.WaitingLoading | Vehicle.Flags.Congestion | Vehicle.Flags.DummyTraffic | Vehicle.Flags.Underground | Vehicle.Flags.Transition | Vehicle.Flags.InsideBuilding | Vehicle.Flags.LeftHandDrive))
+        return;
+      data.m_flags |= Vehicle.Flags.Exporting;
+    }
+  }
     
     public override void SetTarget(ushort vehicleID, ref Vehicle data, ushort targetBuilding)
     {
@@ -117,6 +155,7 @@ public class CargoFerryAI : FerryAI
       this.RemoveSource(vehicleID, ref data);
       this.RemoveTarget(vehicleID, ref data);
       base.ReleaseVehicle(vehicleID, ref data);
+      UnityEngine.Debug.Log(new System.Diagnostics.StackTrace().ToString());
     }
     
     private void RemoveSource(ushort vehicleID, ref Vehicle data)
@@ -210,8 +249,105 @@ public class CargoFerryAI : FerryAI
         data.m_flags |= Vehicle.Flags.WaitingLoading;
         return false;
       }
+
+  protected override bool StartPathFind(ushort vehicleID, ref Vehicle vehicleData)
+  {
+    if (vehicleData.m_leadingVehicle == (ushort) 0)
+    {
+      Vector3 startPos = (vehicleData.m_flags & Vehicle.Flags.Reversed) == ~(Vehicle.Flags.Created | Vehicle.Flags.Deleted | Vehicle.Flags.Spawned | Vehicle.Flags.Inverted | Vehicle.Flags.TransferToTarget | Vehicle.Flags.TransferToSource | Vehicle.Flags.Emergency1 | Vehicle.Flags.Emergency2 | Vehicle.Flags.WaitingPath | Vehicle.Flags.Stopped | Vehicle.Flags.Leaving | Vehicle.Flags.Arriving | Vehicle.Flags.Reversed | Vehicle.Flags.TakingOff | Vehicle.Flags.Flying | Vehicle.Flags.Landing | Vehicle.Flags.WaitingSpace | Vehicle.Flags.WaitingCargo | Vehicle.Flags.GoingBack | Vehicle.Flags.WaitingTarget | Vehicle.Flags.Importing | Vehicle.Flags.Exporting | Vehicle.Flags.Parking | Vehicle.Flags.CustomName | Vehicle.Flags.OnGravel | Vehicle.Flags.WaitingLoading | Vehicle.Flags.Congestion | Vehicle.Flags.DummyTraffic | Vehicle.Flags.Underground | Vehicle.Flags.Transition | Vehicle.Flags.InsideBuilding | Vehicle.Flags.LeftHandDrive) ? (Vector3) vehicleData.m_targetPos0 : (Vector3) Singleton<VehicleManager>.instance.m_vehicles.m_buffer[(int) vehicleData.GetLastVehicle(vehicleID)].m_targetPos0;
+      if ((vehicleData.m_flags & Vehicle.Flags.GoingBack) != ~(Vehicle.Flags.Created | Vehicle.Flags.Deleted | Vehicle.Flags.Spawned | Vehicle.Flags.Inverted | Vehicle.Flags.TransferToTarget | Vehicle.Flags.TransferToSource | Vehicle.Flags.Emergency1 | Vehicle.Flags.Emergency2 | Vehicle.Flags.WaitingPath | Vehicle.Flags.Stopped | Vehicle.Flags.Leaving | Vehicle.Flags.Arriving | Vehicle.Flags.Reversed | Vehicle.Flags.TakingOff | Vehicle.Flags.Flying | Vehicle.Flags.Landing | Vehicle.Flags.WaitingSpace | Vehicle.Flags.WaitingCargo | Vehicle.Flags.GoingBack | Vehicle.Flags.WaitingTarget | Vehicle.Flags.Importing | Vehicle.Flags.Exporting | Vehicle.Flags.Parking | Vehicle.Flags.CustomName | Vehicle.Flags.OnGravel | Vehicle.Flags.WaitingLoading | Vehicle.Flags.Congestion | Vehicle.Flags.DummyTraffic | Vehicle.Flags.Underground | Vehicle.Flags.Transition | Vehicle.Flags.InsideBuilding | Vehicle.Flags.LeftHandDrive))
+      {
+        if (vehicleData.m_sourceBuilding != (ushort) 0)
+        {
+          BuildingManager instance = Singleton<BuildingManager>.instance;
+          BuildingInfo info = instance.m_buildings.m_buffer[(int) vehicleData.m_sourceBuilding].Info;
+          Randomizer randomizer = new Randomizer((int) vehicleID);
+          Vector3 position;
+          info.m_buildingAI.CalculateSpawnPosition(vehicleData.m_sourceBuilding, ref instance.m_buildings.m_buffer[(int) vehicleData.m_sourceBuilding], ref randomizer, this.m_info, out position, out Vector3 _);
+          var startPathFind = this.StartPathFind(vehicleID, ref vehicleData, startPos, position);
+          return startPathFind;
+        }
+      }
+      else if (vehicleData.m_targetBuilding != (ushort) 0)
+      {
+        BuildingManager instance = Singleton<BuildingManager>.instance;
+        BuildingInfo info = instance.m_buildings.m_buffer[(int) vehicleData.m_targetBuilding].Info;
+        Randomizer randomizer = new Randomizer((int) vehicleID);
+        Vector3 position;
+        info.m_buildingAI.CalculateSpawnPosition(vehicleData.m_targetBuilding, ref instance.m_buildings.m_buffer[(int) vehicleData.m_targetBuilding], ref randomizer, this.m_info, out position, out Vector3 _);
+        var startPathFind = this.StartPathFind(vehicleID, ref vehicleData, startPos, position);
+        return startPathFind;
+      }
+    }
+    return false;
+  }
+
+  public override bool TrySpawn(ushort vehicleID, ref Vehicle vehicleData)
+  {
+    if ((vehicleData.m_flags & Vehicle.Flags.Spawned) != ~(Vehicle.Flags.Created | Vehicle.Flags.Deleted | Vehicle.Flags.Spawned | Vehicle.Flags.Inverted | Vehicle.Flags.TransferToTarget | Vehicle.Flags.TransferToSource | Vehicle.Flags.Emergency1 | Vehicle.Flags.Emergency2 | Vehicle.Flags.WaitingPath | Vehicle.Flags.Stopped | Vehicle.Flags.Leaving | Vehicle.Flags.Arriving | Vehicle.Flags.Reversed | Vehicle.Flags.TakingOff | Vehicle.Flags.Flying | Vehicle.Flags.Landing | Vehicle.Flags.WaitingSpace | Vehicle.Flags.WaitingCargo | Vehicle.Flags.GoingBack | Vehicle.Flags.WaitingTarget | Vehicle.Flags.Importing | Vehicle.Flags.Exporting | Vehicle.Flags.Parking | Vehicle.Flags.CustomName | Vehicle.Flags.OnGravel | Vehicle.Flags.WaitingLoading | Vehicle.Flags.Congestion | Vehicle.Flags.DummyTraffic | Vehicle.Flags.Underground | Vehicle.Flags.Transition | Vehicle.Flags.InsideBuilding | Vehicle.Flags.LeftHandDrive))
+      return true;
+    if (CheckOverlap(vehicleData.m_segment, (ushort) 0))
+    {
+      vehicleData.m_flags |= Vehicle.Flags.WaitingSpace;
+      return false;
+    }
+    PathUnit.Position position;
+    if (vehicleData.m_path != 0U && Singleton<PathManager>.instance.m_pathUnits.m_buffer[vehicleData.m_path].GetPosition(0, out position))
+    {
+      uint laneId = PathManager.GetLaneID(position);
+      if (laneId != 0U && !Singleton<NetManager>.instance.m_lanes.m_buffer[laneId].CheckSpace(1000f, vehicleID))
+      {
+        vehicleData.m_flags |= Vehicle.Flags.WaitingSpace;
+        return false;
+      }
+    }
+    vehicleData.Spawn(vehicleID);
+    vehicleData.m_flags &= Vehicle.Flags.Created | Vehicle.Flags.Deleted | Vehicle.Flags.Spawned | Vehicle.Flags.Inverted | Vehicle.Flags.TransferToTarget | Vehicle.Flags.TransferToSource | Vehicle.Flags.Emergency1 | Vehicle.Flags.Emergency2 | Vehicle.Flags.WaitingPath | Vehicle.Flags.Stopped | Vehicle.Flags.Leaving | Vehicle.Flags.Arriving | Vehicle.Flags.Reversed | Vehicle.Flags.TakingOff | Vehicle.Flags.Flying | Vehicle.Flags.Landing | Vehicle.Flags.WaitingCargo | Vehicle.Flags.GoingBack | Vehicle.Flags.WaitingTarget | Vehicle.Flags.Importing | Vehicle.Flags.Exporting | Vehicle.Flags.Parking | Vehicle.Flags.CustomName | Vehicle.Flags.OnGravel | Vehicle.Flags.WaitingLoading | Vehicle.Flags.Congestion | Vehicle.Flags.DummyTraffic | Vehicle.Flags.Underground | Vehicle.Flags.Transition | Vehicle.Flags.InsideBuilding | Vehicle.Flags.LeftHandDrive;
+    return true;
+  }
     
-   
+    private static bool CheckOverlap(Segment3 segment, ushort ignoreVehicle)
+    {
+      VehicleManager instance = Singleton<VehicleManager>.instance;
+      Vector3 vector3_1 = segment.Min();
+      Vector3 vector3_2 = segment.Max();
+      int num1 = Mathf.Max((int) (((double) vector3_1.x - 100.0) / 320.0 + 27.0), 0);
+      int num2 = Mathf.Max((int) (((double) vector3_1.z - 100.0) / 320.0 + 27.0), 0);
+      int num3 = Mathf.Min((int) (((double) vector3_2.x + 100.0) / 320.0 + 27.0), 53);
+      int num4 = Mathf.Min((int) (((double) vector3_2.z + 100.0) / 320.0 + 27.0), 53);
+      bool overlap = false;
+      for (int index1 = num2; index1 <= num4; ++index1)
+      {
+        for (int index2 = num1; index2 <= num3; ++index2)
+        {
+          ushort otherID = instance.m_vehicleGrid2[index1 * 54 + index2];
+          int num5 = 0;
+          while (otherID != (ushort) 0)
+          {
+            otherID = CheckOverlap(segment, ignoreVehicle, otherID, ref instance.m_vehicles.m_buffer[(int) otherID], ref overlap);
+            if (++num5 > 16384)
+            {
+              CODebugBase<LogChannel>.Error(LogChannel.Core, "Invalid list detected!\n" + System.Environment.StackTrace);
+              break;
+            }
+          }
+        }
+      }
+      return overlap;
+    }
+
+    private static ushort CheckOverlap(
+      Segment3 segment,
+      ushort ignoreVehicle,
+      ushort otherID,
+      ref Vehicle otherData,
+      ref bool overlap)
+    {
+      if ((ignoreVehicle == (ushort) 0 || (int) otherID != (int) ignoreVehicle && (int) otherData.m_leadingVehicle != (int) ignoreVehicle && (int) otherData.m_trailingVehicle != (int) ignoreVehicle) && (double) segment.DistanceSqr(otherData.m_segment, out float _, out float _) < 400.0)
+        overlap = true;
+      return otherData.m_nextGridVehicle;
+    }
+
     //UI stuff
     
       public override Color GetColor(
