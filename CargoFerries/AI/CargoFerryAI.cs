@@ -115,6 +115,35 @@ public class CargoFerryAI : FerryAI
       data.m_targetBuilding = (ushort) 0;
     }
     
+    public override bool CanSpawnAt(Vector3 pos)
+    {
+      VehicleManager instance = Singleton<VehicleManager>.instance;
+      int num1 = Mathf.Max((int) (((double) pos.x - 300.0) / 320.0 + 27.0), 0);
+      int num2 = Mathf.Max((int) (((double) pos.z - 300.0) / 320.0 + 27.0), 0);
+      int num3 = Mathf.Min((int) (((double) pos.x + 300.0) / 320.0 + 27.0), 53);
+      int num4 = Mathf.Min((int) (((double) pos.z + 300.0) / 320.0 + 27.0), 53);
+      for (int index1 = num2; index1 <= num4; ++index1)
+      {
+        for (int index2 = num1; index2 <= num3; ++index2)
+        {
+          ushort nextGridVehicle = instance.m_vehicleGrid2[index1 * 54 + index2];
+          int num5 = 0;
+          while (nextGridVehicle != (ushort) 0)
+          {
+            if ((double) Vector3.SqrMagnitude(instance.m_vehicles.m_buffer[(int) nextGridVehicle].GetLastFramePosition() - pos) < 90000.0)
+              return false;
+            nextGridVehicle = instance.m_vehicles.m_buffer[(int) nextGridVehicle].m_nextGridVehicle;
+            if (++num5 > 16384)
+            {
+              CODebugBase<LogChannel>.Error(LogChannel.Core, "Invalid list detected!\n" + System.Environment.StackTrace);
+              break;
+            }
+          }
+        }
+      }
+      return true;
+    }
+    
     public override void SimulationStep(ushort vehicleID, ref Vehicle data, Vector3 physicsLodRefPos)
     {
       if ((data.m_flags & Vehicle.Flags.WaitingCargo) != ~(Vehicle.Flags.Created | Vehicle.Flags.Deleted | Vehicle.Flags.Spawned | Vehicle.Flags.Inverted | Vehicle.Flags.TransferToTarget | Vehicle.Flags.TransferToSource | Vehicle.Flags.Emergency1 | Vehicle.Flags.Emergency2 | Vehicle.Flags.WaitingPath | Vehicle.Flags.Stopped | Vehicle.Flags.Leaving | Vehicle.Flags.Arriving | Vehicle.Flags.Reversed | Vehicle.Flags.TakingOff | Vehicle.Flags.Flying | Vehicle.Flags.Landing | Vehicle.Flags.WaitingSpace | Vehicle.Flags.WaitingCargo | Vehicle.Flags.GoingBack | Vehicle.Flags.WaitingTarget | Vehicle.Flags.Importing | Vehicle.Flags.Exporting | Vehicle.Flags.Parking | Vehicle.Flags.CustomName | Vehicle.Flags.OnGravel | Vehicle.Flags.WaitingLoading | Vehicle.Flags.Congestion | Vehicle.Flags.DummyTraffic | Vehicle.Flags.Underground | Vehicle.Flags.Transition | Vehicle.Flags.InsideBuilding | Vehicle.Flags.LeftHandDrive))
