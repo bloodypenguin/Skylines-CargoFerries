@@ -40,6 +40,7 @@
     <Compile Include="HarmonyPatches\BuildingInfoPatch.cs" />
     <Compile Include="HarmonyPatches\CargoTruckAIChangeVehicleTypePatch.cs" />
     <Compile Include="HarmonyPatches\CargoTruckVehicleTypePatch.cs" />
+    <Compile Include="HarmonyPatches\FerryAIPatch.cs" />
     <Compile Include="HarmonyPatches\VehicleInfoPatch.cs" />
     <Compile Include="ItemClasses.cs" />
     <Compile Include="Mod.cs" />

@@ -17,6 +17,7 @@ namespace CargoFerries
             {
                 return;
             }
+            FerryAIPatch.Apply();
             VehicleInfoPatch.Apply();
             CargoTruckVehicleTypePatch.Apply();
             BuildingInfoPatch.Apply();
@@ -83,6 +84,7 @@ namespace CargoFerries
             CargoTruckVehicleTypePatch.Undo();
             BuildingInfoPatch.Undo();
             CargoTruckAIChangeVehicleTypePatch.Undo();
+            FerryAIPatch.Undo();
             ItemClasses.Unregister();
         }
     }
