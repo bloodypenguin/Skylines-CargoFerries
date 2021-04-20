@@ -13,13 +13,17 @@ namespace CargoFerries.Config
             {
                 VehicleCategory.CargoShip, new[]
                 {
+                    new VehicleItem(859777509, "River Container Ship Pack 1"), 
+                    new VehicleItem(862748181, "River Container Ship Pack 2"), 
+                    new VehicleItem(863432439, "River Container Ship Pack 3"), 
                     new VehicleItem(933246365, "Small River Container Ship 1"), 
+                    new VehicleItem(933247367, "Small River Container Ship 2"), 
+                    new VehicleItem(933247999, "Small River Container Ship 3"),
                 }
             },
             {
-                VehicleCategory.CargoHelicopter, new[]
+                VehicleCategory.CargoHelicopter, new VehicleItem[]
                 {
-                    new VehicleItem(2049590763, "mi-8 hip passenger helicopter"), 
                 }
             }
         };
