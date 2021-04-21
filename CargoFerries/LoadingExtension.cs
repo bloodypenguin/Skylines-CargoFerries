@@ -21,7 +21,12 @@ namespace CargoFerries
             VehicleInfoPatch.Apply();
             CargoTruckVehicleTypePatch.Apply();
             BuildingInfoPatch.Apply();
-            CargoTruckAIChangeVehicleTypePatch.Apply(); //TODO: check SVS2 is not enabled
+            if (Util.IsModActive("Service Vehicle Selector 2"))
+            {
+                UnityEngine.Debug.Log("MCM: Service Vehicle Selector 2 is detected! CargoTruckAI.ChangeVehicleType() won't be patched");
+            } else {
+                CargoTruckAIChangeVehicleTypePatch.Apply(); 
+            }
         }
 
         private static void ReleaseWrongVehicles()
