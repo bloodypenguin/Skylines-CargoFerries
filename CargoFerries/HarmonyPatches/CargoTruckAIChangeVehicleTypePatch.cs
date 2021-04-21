@@ -11,20 +11,34 @@ namespace CargoFerries.HarmonyPatches
 {
     public class CargoTruckAIChangeVehicleTypePatch
     {
+
+        private static bool isApplied = false;
+        
         public static void Apply()
         {
+            if (isApplied)
+            {
+                return;
+            }
             PatchUtil.Patch(
                 new PatchUtil.MethodDefinition(typeof(CargoTruckAI), nameof(CargoTruckAI.ChangeVehicleType),
                     BindingFlags.Static | BindingFlags.Public),
                 null, null,
                 new PatchUtil.MethodDefinition(typeof(CargoTruckAIChangeVehicleTypePatch), (nameof(Transpile))));
+            isApplied = true;
+
         }
 
         public static void Undo()
         {
+            if (!isApplied)
+            {
+                return;
+            }
             PatchUtil.Unpatch(new PatchUtil.MethodDefinition(typeof(CargoTruckAI),
                 nameof(CargoTruckAI.ChangeVehicleType),
                 BindingFlags.Static | BindingFlags.Public));
+            isApplied = false;
         }
 
         private static IEnumerable<CodeInstruction> Transpile(MethodBase original,
