@@ -20,11 +20,6 @@ namespace CargoFerries.Config
                     new VehicleItem(933247367, "Small River Container Ship 2"), 
                     new VehicleItem(933247999, "Small River Container Ship 3"),
                 }
-            },
-            {
-                VehicleCategory.CargoHelicopter, new VehicleItem[]
-                {
-                }
             }
         };
 
@@ -44,8 +39,7 @@ namespace CargoFerries.Config
                 {
                     return _ids;
                 }
-                _ids[VehicleCategory.CargoShip] = OptionsWrapper<Config>.Options.CargoFerries.Items.ToArray();
-                _ids[VehicleCategory.CargoHelicopter] = OptionsWrapper<Config>.Options.CargoHelicopters.Items.ToArray();
+                _ids[VehicleCategory.CargoShip] = OptionsWrapper<Config>.Options.Barges.Items.ToArray();
                 _configIsOverriden = true;
                 return _ids;
             }
@@ -70,8 +64,6 @@ namespace CargoFerries.Config
             {
                 case VehicleCategory.CargoShip:
                     return Util.DLC(SteamHelper.kMotionDLCAppID) ;
-                case VehicleCategory.CargoHelicopter:
-                    return Util.DLC(SteamHelper.kUrbanDLCAppID) ;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(vehicleCategory), vehicleCategory, null);
             }

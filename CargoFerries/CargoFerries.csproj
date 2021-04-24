@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CargoFerries</RootNamespace>
-    <AssemblyName>MoreCargoModes</AssemblyName>
+    <AssemblyName>CargoFerries</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <LangVersion>8</LangVersion>
@@ -33,8 +33,8 @@
   <ItemGroup>
     <Compile Include="AI\CargoFerryAI.cs" />
     <Compile Include="AI\CargoFerryHarborAI.cs" />
-    <Compile Include="Config\VehicleCategory.cs" />
     <Compile Include="Config\Config.cs" />
+    <Compile Include="Config\VehicleCategory.cs" />
     <Compile Include="Config\VehicleItem.cs" />
     <Compile Include="Config\VehicleItems.cs" />
     <Compile Include="HarmonyPatches\BuildingInfoPatch.cs" />

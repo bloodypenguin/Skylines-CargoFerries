@@ -3,7 +3,7 @@ using CargoFerries.OptionsFramework.Attibutes;
 
 namespace CargoFerries
 {
-    [Options("MoreCargoModes-Options")]
+    [Options("CargoFerries-Options")]
     public class Options
     {
     }

@@ -7,7 +7,7 @@ namespace CargoFerries.Utils
 {
     public static class PatchUtil
     {
-        private const string HarmonyId = "github.com/bloodypenguin/Skylines-MoreCargoModes";
+        private const string HarmonyId = "github.com/bloodypenguin/Skylines-CargoFerries";
         private static HarmonyInstance _harmonyInstance = null;
 
         private static HarmonyInstance HarmonyInstance =>
@@ -22,12 +22,12 @@ namespace CargoFerries.Utils
             if (prefix == null && postfix == null && transpiler == null)
             {
                 throw new Exception(
-                    $"MCM: prefix, postfix and transpiler are null for method {original.Type.FullName}.{original.MethodName}");
+                    $"Barges: prefix, postfix and transpiler are null for method {original.Type.FullName}.{original.MethodName}");
             }
 
             try
             {
-                Debug.Log($"MCM: Patching method {original.Type.FullName}.{original.MethodName}");
+                Debug.Log($"Barges: Patching method {original.Type.FullName}.{original.MethodName}");
                 var methodInfo = GetOriginal(original);
                 HarmonyInstance.Patch(methodInfo,
                     prefix: prefix == null ? null : new HarmonyMethod(GetPatch(prefix)),
@@ -37,14 +37,14 @@ namespace CargoFerries.Utils
             }
             catch (Exception e)
             {
-                Debug.LogError($"MCM: Failed to patch method {original.Type.FullName}.{original.MethodName}");
+                Debug.LogError($"Barges: Failed to patch method {original.Type.FullName}.{original.MethodName}");
                 Debug.LogException(e);
             }
         }
 
         public static void Unpatch(MethodDefinition original)
         {
-            Debug.Log($"MCM: Unpatching method {original.Type.FullName}.{original.MethodName}");
+            Debug.Log($"Barges: Unpatching method {original.Type.FullName}.{original.MethodName}");
             HarmonyInstance.Unpatch(GetOriginal(original), HarmonyPatchType.All, HarmonyId);
         }
 
@@ -59,7 +59,7 @@ namespace CargoFerries.Utils
             if (methodInfo == null)
             {
                 throw new Exception(
-                    $"MCM: Failed to find original method {original.Type.FullName}.{original.MethodName}");
+                    $"Barges: Failed to find original method {original.Type.FullName}.{original.MethodName}");
             }
 
             return methodInfo;
@@ -76,7 +76,7 @@ namespace CargoFerries.Utils
             
             if (methodInfo == null)
             {
-                throw new Exception($"MCM: Failed to find patch method {patch.Type.FullName}.{patch.MethodName}");
+                throw new Exception($"Barges: Failed to find patch method {patch.Type.FullName}.{patch.MethodName}");
             }
 
             return methodInfo;

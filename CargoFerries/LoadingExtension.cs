@@ -23,7 +23,7 @@ namespace CargoFerries
             BuildingInfoPatch.Apply();
             if (Util.IsModActive("Service Vehicle Selector 2"))
             {
-                UnityEngine.Debug.Log("MCM: Service Vehicle Selector 2 is detected! CargoTruckAI.ChangeVehicleType() won't be patched");
+                UnityEngine.Debug.Log("Barges: Service Vehicle Selector 2 is detected! CargoTruckAI.ChangeVehicleType() won't be patched");
             } else {
                 CargoTruckAIChangeVehicleTypePatch.Apply(); 
             }

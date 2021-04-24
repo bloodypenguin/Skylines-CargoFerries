@@ -44,7 +44,7 @@ namespace CargoFerries.HarmonyPatches
         private static IEnumerable<CodeInstruction> Transpile(MethodBase original,
             IEnumerable<CodeInstruction> instructions)
         {
-            Debug.Log("MCM: Transpiling method: " + original.DeclaringType + "." + original);
+            Debug.Log("Barges: Transpiling method: " + original.DeclaringType + "." + original);
             var codes = new List<CodeInstruction>(instructions);
             var newCodes = new List<CodeInstruction>();
             foreach (var codeInstruction in codes)
@@ -62,7 +62,7 @@ namespace CargoFerries.HarmonyPatches
                 newCodes.Add(new CodeInstruction(OpCodes.Call,
                     AccessTools.Method(typeof(CargoTruckAIChangeVehicleTypePatch), nameof(GetCargoVehicleInfo))));
                 Debug.Log(
-                    "MCM: Transpiled CargoTruckAI.ChangeVehicleType()");
+                    "Barges: Transpiled CargoTruckAI.ChangeVehicleType()");
             }
 
             return newCodes.AsEnumerable();
