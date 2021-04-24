@@ -16,7 +16,6 @@ namespace CargoFerries
 
         public void OnSettingsUI(UIHelperBase helper)
         {
-            helper.AddOptionsGroup<Options>();
             try
             {
                 OptionsWrapper<Config.Config>.Ensure();
