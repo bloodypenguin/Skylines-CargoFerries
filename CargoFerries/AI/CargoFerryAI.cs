@@ -1,6 +1,7 @@
 using ColossalFramework;
 using ColossalFramework.Math;
 using System;
+using CargoFerries;
 using UnityEngine;
 
 //based of FerryAI + parts from CargoShipAI
@@ -133,7 +134,7 @@ public class CargoFerryAI : FerryAI
             if ((double) Vector3.SqrMagnitude(instance.m_vehicles.m_buffer[(int) nextGridVehicle].GetLastFramePosition() - pos) < 90000.0)
               return false;
             nextGridVehicle = instance.m_vehicles.m_buffer[(int) nextGridVehicle].m_nextGridVehicle;
-            if (++num5 > 16384)
+            if (++num5 > Mod.MaxVehicleCount)
             {
               CODebugBase<LogChannel>.Error(LogChannel.Core, "Invalid list detected!\n" + System.Environment.StackTrace);
               break;
@@ -259,7 +260,7 @@ public class CargoFerryAI : FerryAI
           instance.m_vehicles.m_buffer[(int) vehicle].m_cargoParent = (ushort) 0;
           instance.ReleaseVehicle(vehicle);
           vehicle = nextCargo;
-          if (++num > 16384)
+          if (++num > Mod.MaxVehicleCount)
           {
             CODebugBase<LogChannel>.Error(LogChannel.Core, "Invalid list detected!\n" + System.Environment.StackTrace);
             break;
@@ -288,7 +289,7 @@ public class CargoFerryAI : FerryAI
             info.m_vehicleAI.SetTarget(vehicleID1, ref instance.m_vehicles.m_buffer[(int) vehicleID1], instance.m_vehicles.m_buffer[(int) vehicleID1].m_targetBuilding);
           }
           vehicleID1 = nextCargo;
-          if (++num > 16384)
+          if (++num > Mod.MaxVehicleCount)
           {
             CODebugBase<LogChannel>.Error(LogChannel.Core, "Invalid list detected!\n" + System.Environment.StackTrace);
             break;
@@ -428,7 +429,7 @@ public class CargoFerryAI : FerryAI
       {
         ++current;
         num1 = instance.m_vehicles.m_buffer[(int) num1].m_nextCargo;
-        if (++num2 > 16384)
+        if (++num2 > Mod.MaxVehicleCount)
         {
           CODebugBase<LogChannel>.Error(LogChannel.Core, "Invalid list detected!\n" + System.Environment.StackTrace);
           break;

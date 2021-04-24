@@ -20,7 +20,17 @@ namespace CargoFerries
             FerryAIPatch.Apply();
             VehicleInfoPatch.Apply();
             CargoTruckVehicleTypePatch.Apply();
-            BuildingInfoPatch.Apply();
+            //BuildingInfoPatch.Apply();
+            if (Util.IsModActive(1764208250))
+            {
+                UnityEngine.Debug.LogWarning("Barges: More Vehicles is enabled, applying compatibility workaround");
+                Mod.MaxVehicleCount = ushort.MaxValue + 1;
+            }
+            else
+            {
+                UnityEngine.Debug.Log("Barges: More Vehicles is not enabled");
+                Mod.MaxVehicleCount = VehicleManager.MAX_VEHICLE_COUNT;
+            }
             if (Util.IsModActive("Service Vehicle Selector 2"))
             {
                 UnityEngine.Debug.Log("Barges: Service Vehicle Selector 2 is detected! CargoTruckAI.ChangeVehicleType() won't be patched");
@@ -87,7 +97,7 @@ namespace CargoFerries
             base.OnReleased();
             VehicleInfoPatch.Undo();
             CargoTruckVehicleTypePatch.Undo();
-            BuildingInfoPatch.Undo();
+            //BuildingInfoPatch.Undo();
             CargoTruckAIChangeVehicleTypePatch.Undo();
             FerryAIPatch.Undo();
             ItemClasses.Unregister();
