@@ -6,9 +6,9 @@ using CargoFerries.Utils;
 using Harmony;
 using UnityEngine;
 
-namespace CargoFerries.HarmonyPatches
+namespace CargoFerries.HarmonyPatches.CargoTruckAIPatch
 {
-    public class CargoTruckVehicleTypePatch
+    public class NeedChangeVehicleTypePatch
     {
         public static void Apply()
         {
@@ -16,7 +16,7 @@ namespace CargoFerries.HarmonyPatches
                 new PatchUtil.MethodDefinition(typeof(CargoTruckAI), nameof(CargoTruckAI.NeedChangeVehicleType),
                     BindingFlags.Public | BindingFlags.Static),
                 null, null,
-                new PatchUtil.MethodDefinition(typeof(CargoTruckVehicleTypePatch), (nameof(Transpile))));
+                new PatchUtil.MethodDefinition(typeof(NeedChangeVehicleTypePatch), (nameof(Transpile))));
             PatchUtil.Patch(
                 new PatchUtil.MethodDefinition(typeof(CargoTruckAI), "StartPathFind",
                     BindingFlags.Default, new[]
@@ -30,7 +30,7 @@ namespace CargoFerries.HarmonyPatches
                         typeof(bool)
                     }),
                 null, null,
-                new PatchUtil.MethodDefinition(typeof(CargoTruckVehicleTypePatch), (nameof(Transpile))));
+                new PatchUtil.MethodDefinition(typeof(NeedChangeVehicleTypePatch), (nameof(Transpile))));
         }
 
         public static void Undo()

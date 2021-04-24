@@ -7,9 +7,9 @@ using CargoFerries.Utils;
 using Harmony;
 using UnityEngine;
 
-namespace CargoFerries.HarmonyPatches
+namespace CargoFerries.HarmonyPatches.FerryAIPatch
 {
-    public class FerryAIPatch
+    public class SimulationStepPatch
     {
         public static void Apply()
         {
@@ -17,7 +17,7 @@ namespace CargoFerries.HarmonyPatches
                 new PatchUtil.MethodDefinition(typeof(FerryAI), nameof(FerryAI.SimulationStep),
                     argumentTypes: new Type[] {typeof(ushort), typeof(Vehicle).MakeByRefType(), typeof(Vector3)}),
                 null, null,
-                new PatchUtil.MethodDefinition(typeof(FerryAIPatch), (nameof(Transpile))));
+                new PatchUtil.MethodDefinition(typeof(SimulationStepPatch), (nameof(Transpile))));
         }
 
         public static void Undo()

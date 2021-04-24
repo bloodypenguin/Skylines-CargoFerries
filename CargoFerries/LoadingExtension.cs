@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
-using CargoFerries.HarmonyPatches;
 using ColossalFramework;
 using ICities;
 
@@ -17,10 +15,10 @@ namespace CargoFerries
             {
                 return;
             }
-            FerryAIPatch.Apply();
-            VehicleInfoPatch.Apply();
-            CargoTruckVehicleTypePatch.Apply();
-            BuildingInfoPatch.Apply();
+            HarmonyPatches.BuildingInfoPatch. InitializePrefabPatch.Apply();
+            HarmonyPatches.FerryAIPatch.SimulationStepPatch.Apply();
+            HarmonyPatches.VehicleInfoPatch.InitializePrefabPatch.Apply();
+            HarmonyPatches.CargoTruckAIPatch.NeedChangeVehicleTypePatch.Apply();
             if (Util.IsModActive(1764208250))
             {
                 UnityEngine.Debug.LogWarning("Barges: More Vehicles is enabled, applying compatibility workaround");
@@ -35,7 +33,7 @@ namespace CargoFerries
             {
                 UnityEngine.Debug.Log("Barges: Service Vehicle Selector 2 is detected! CargoTruckAI.ChangeVehicleType() won't be patched");
             } else {
-                CargoTruckAIChangeVehicleTypePatch.Apply(); 
+                HarmonyPatches.CargoTruckAIPatch.ChangeVehicleTypePatch.Apply(); 
             }
         }
 
@@ -95,11 +93,11 @@ namespace CargoFerries
         public override void OnReleased()
         {
             base.OnReleased();
-            VehicleInfoPatch.Undo();
-            CargoTruckVehicleTypePatch.Undo();
-            //BuildingInfoPatch.Undo();
-            CargoTruckAIChangeVehicleTypePatch.Undo();
-            FerryAIPatch.Undo();
+            HarmonyPatches.BuildingInfoPatch.InitializePrefabPatch.Undo();
+            HarmonyPatches.FerryAIPatch.SimulationStepPatch.Undo();
+            HarmonyPatches.VehicleInfoPatch.InitializePrefabPatch.Undo();
+            HarmonyPatches.CargoTruckAIPatch.NeedChangeVehicleTypePatch.Undo();
+            HarmonyPatches.CargoTruckAIPatch.ChangeVehicleTypePatch.Undo();
             ItemClasses.Unregister();
         }
     }

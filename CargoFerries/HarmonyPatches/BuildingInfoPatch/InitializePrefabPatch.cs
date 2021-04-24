@@ -1,14 +1,13 @@
 using System;
-using System.Reflection;
 using CargoFerries.AI;
 using CargoFerries.Utils;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace CargoFerries.HarmonyPatches
+namespace CargoFerries.HarmonyPatches.BuildingInfoPatch
 {
     
-    public class BuildingInfoPatch
+    public class InitializePrefabPatch
     {
         private static bool deployed;
 
@@ -20,8 +19,8 @@ namespace CargoFerries.HarmonyPatches
             }
 
             PatchUtil.Patch(
-                new PatchUtil.MethodDefinition(typeof(BuildingInfo), nameof(BuildingInfo.InitializePrefab)),
-                new PatchUtil.MethodDefinition(typeof(BuildingInfoPatch), nameof(PreInitializePrefab)));
+                new PatchUtil.MethodDefinition(typeof(global::BuildingInfo), nameof(global::BuildingInfo.InitializePrefab)),
+                new PatchUtil.MethodDefinition(typeof(InitializePrefabPatch), nameof(PreInitializePrefab)));
 
             deployed = true;
         }
@@ -34,12 +33,12 @@ namespace CargoFerries.HarmonyPatches
             }
 
             PatchUtil.Unpatch(
-                new PatchUtil.MethodDefinition(typeof(BuildingInfo), nameof(BuildingInfo.InitializePrefab)));
+                new PatchUtil.MethodDefinition(typeof(global::BuildingInfo), nameof(global::BuildingInfo.InitializePrefab)));
 
             deployed = false;
         }
 
-        private static bool PreInitializePrefab(BuildingInfo __instance)
+        private static bool PreInitializePrefab(global::BuildingInfo __instance)
         {
             try
             {

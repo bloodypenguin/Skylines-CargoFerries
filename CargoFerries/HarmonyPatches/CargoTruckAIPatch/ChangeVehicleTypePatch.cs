@@ -7,9 +7,9 @@ using ColossalFramework;
 using Harmony;
 using UnityEngine;
 
-namespace CargoFerries.HarmonyPatches
+namespace CargoFerries.HarmonyPatches.CargoTruckAIPatch
 {
-    public class CargoTruckAIChangeVehicleTypePatch
+    public class ChangeVehicleTypePatch
     {
 
         private static bool isApplied = false;
@@ -21,10 +21,10 @@ namespace CargoFerries.HarmonyPatches
                 return;
             }
             PatchUtil.Patch(
-                new PatchUtil.MethodDefinition(typeof(CargoTruckAI), nameof(CargoTruckAI.ChangeVehicleType),
+                new PatchUtil.MethodDefinition(typeof(global::CargoTruckAI), nameof(global::CargoTruckAI.ChangeVehicleType),
                     BindingFlags.Static | BindingFlags.Public),
                 null, null,
-                new PatchUtil.MethodDefinition(typeof(CargoTruckAIChangeVehicleTypePatch), (nameof(Transpile))));
+                new PatchUtil.MethodDefinition(typeof(ChangeVehicleTypePatch), (nameof(Transpile))));
             isApplied = true;
 
         }
@@ -35,8 +35,8 @@ namespace CargoFerries.HarmonyPatches
             {
                 return;
             }
-            PatchUtil.Unpatch(new PatchUtil.MethodDefinition(typeof(CargoTruckAI),
-                nameof(CargoTruckAI.ChangeVehicleType),
+            PatchUtil.Unpatch(new PatchUtil.MethodDefinition(typeof(global::CargoTruckAI),
+                nameof(global::CargoTruckAI.ChangeVehicleType),
                 BindingFlags.Static | BindingFlags.Public));
             isApplied = false;
         }
@@ -60,7 +60,7 @@ namespace CargoFerries.HarmonyPatches
                 newCodes.Insert(patchIndex, new CodeInstruction(OpCodes.Ldloc_S, 6));
                 newCodes.Insert(patchIndex + 1, new CodeInstruction(OpCodes.Ldloc_S, 7));
                 newCodes.Add(new CodeInstruction(OpCodes.Call,
-                    AccessTools.Method(typeof(CargoTruckAIChangeVehicleTypePatch), nameof(GetCargoVehicleInfo))));
+                    AccessTools.Method(typeof(ChangeVehicleTypePatch), nameof(GetCargoVehicleInfo))));
                 Debug.Log(
                     "Barges: Transpiled CargoTruckAI.ChangeVehicleType()");
             }

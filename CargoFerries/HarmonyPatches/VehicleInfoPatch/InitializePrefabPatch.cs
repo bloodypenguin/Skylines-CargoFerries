@@ -1,14 +1,13 @@
 using System;
 using System.Linq;
-using CargoFerries.AI;
 using CargoFerries.Config;
 using CargoFerries.Utils;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace CargoFerries.HarmonyPatches
+namespace CargoFerries.HarmonyPatches.VehicleInfoPatch
 {
-    public class VehicleInfoPatch
+    public class InitializePrefabPatch
     {
         private static bool deployed;
 
@@ -21,7 +20,7 @@ namespace CargoFerries.HarmonyPatches
 
             PatchUtil.Patch(
                 new PatchUtil.MethodDefinition(typeof(VehicleInfo), nameof(VehicleInfo.InitializePrefab)),
-                new PatchUtil.MethodDefinition(typeof(VehicleInfoPatch), nameof(PreInitializePrefab)));
+                new PatchUtil.MethodDefinition(typeof(InitializePrefabPatch), nameof(PreInitializePrefab)));
 
             deployed = true;
         }
