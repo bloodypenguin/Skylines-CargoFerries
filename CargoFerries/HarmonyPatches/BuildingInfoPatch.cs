@@ -8,7 +8,6 @@ using Object = UnityEngine.Object;
 namespace CargoFerries.HarmonyPatches
 {
     
-    //Normally not applied. Should be enabled by uncommenting lines in LoadingExtension
     public class BuildingInfoPatch
     {
         private static bool deployed;

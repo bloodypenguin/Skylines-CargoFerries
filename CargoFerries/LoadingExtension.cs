@@ -20,7 +20,7 @@ namespace CargoFerries
             FerryAIPatch.Apply();
             VehicleInfoPatch.Apply();
             CargoTruckVehicleTypePatch.Apply();
-            //BuildingInfoPatch.Apply();
+            BuildingInfoPatch.Apply();
             if (Util.IsModActive(1764208250))
             {
                 UnityEngine.Debug.LogWarning("Barges: More Vehicles is enabled, applying compatibility workaround");
