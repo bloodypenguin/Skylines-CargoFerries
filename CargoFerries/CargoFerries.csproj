@@ -43,7 +43,7 @@
     <Compile Include="HarmonyPatches\FerryAIPatch.cs" />
     <Compile Include="HarmonyPatches\VehicleInfoPatch.cs" />
     <Compile Include="ItemClasses.cs" />
-    <Compile Include="Mod.cs" />
+    <Compile Include="CargoFerriesMod.cs" />
     <Compile Include="LoadingExtension.cs" />
     <Compile Include="Options.cs" />
     <Compile Include="OptionsFramework\Attibutes\AbstractOptionsAttribute.cs" />

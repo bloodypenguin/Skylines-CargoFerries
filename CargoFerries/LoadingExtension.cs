@@ -24,12 +24,12 @@ namespace CargoFerries
             if (Util.IsModActive(1764208250))
             {
                 UnityEngine.Debug.LogWarning("Barges: More Vehicles is enabled, applying compatibility workaround");
-                Mod.MaxVehicleCount = ushort.MaxValue + 1;
+                CargoFerriesMod.MaxVehicleCount = ushort.MaxValue + 1;
             }
             else
             {
                 UnityEngine.Debug.Log("Barges: More Vehicles is not enabled");
-                Mod.MaxVehicleCount = VehicleManager.MAX_VEHICLE_COUNT;
+                CargoFerriesMod.MaxVehicleCount = VehicleManager.MAX_VEHICLE_COUNT;
             }
             if (Util.IsModActive("Service Vehicle Selector 2"))
             {

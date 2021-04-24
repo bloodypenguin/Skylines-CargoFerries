@@ -7,7 +7,7 @@ using CargoFerries.OptionsFramework.Extensions;
 
 namespace CargoFerries
 {
-    public class Mod : IUserMod
+    public class CargoFerriesMod : IUserMod
     {
         public static int MaxVehicleCount;
         

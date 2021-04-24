@@ -134,7 +134,7 @@ public class CargoFerryAI : FerryAI
             if ((double) Vector3.SqrMagnitude(instance.m_vehicles.m_buffer[(int) nextGridVehicle].GetLastFramePosition() - pos) < 90000.0)
               return false;
             nextGridVehicle = instance.m_vehicles.m_buffer[(int) nextGridVehicle].m_nextGridVehicle;
-            if (++num5 > Mod.MaxVehicleCount)
+            if (++num5 > CargoFerriesMod.MaxVehicleCount)
             {
               CODebugBase<LogChannel>.Error(LogChannel.Core, "Invalid list detected!\n" + System.Environment.StackTrace);
               break;
@@ -260,7 +260,7 @@ public class CargoFerryAI : FerryAI
           instance.m_vehicles.m_buffer[(int) vehicle].m_cargoParent = (ushort) 0;
           instance.ReleaseVehicle(vehicle);
           vehicle = nextCargo;
-          if (++num > Mod.MaxVehicleCount)
+          if (++num > CargoFerriesMod.MaxVehicleCount)
           {
             CODebugBase<LogChannel>.Error(LogChannel.Core, "Invalid list detected!\n" + System.Environment.StackTrace);
             break;
@@ -289,7 +289,7 @@ public class CargoFerryAI : FerryAI
             info.m_vehicleAI.SetTarget(vehicleID1, ref instance.m_vehicles.m_buffer[(int) vehicleID1], instance.m_vehicles.m_buffer[(int) vehicleID1].m_targetBuilding);
           }
           vehicleID1 = nextCargo;
-          if (++num > Mod.MaxVehicleCount)
+          if (++num > CargoFerriesMod.MaxVehicleCount)
           {
             CODebugBase<LogChannel>.Error(LogChannel.Core, "Invalid list detected!\n" + System.Environment.StackTrace);
             break;
@@ -429,7 +429,7 @@ public class CargoFerryAI : FerryAI
       {
         ++current;
         num1 = instance.m_vehicles.m_buffer[(int) num1].m_nextCargo;
-        if (++num2 > Mod.MaxVehicleCount)
+        if (++num2 > CargoFerriesMod.MaxVehicleCount)
         {
           CODebugBase<LogChannel>.Error(LogChannel.Core, "Invalid list detected!\n" + System.Environment.StackTrace);
           break;
