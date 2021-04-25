@@ -36,6 +36,8 @@
     <Compile Include="HarmonyPatches\BuildingInfoPatch\InitializePrefabPatch.cs" />
     <Compile Include="HarmonyPatches\CargoTruckAIPatch\ChangeVehicleTypePatch.cs" />
     <Compile Include="HarmonyPatches\CargoTruckAIPatch\NeedChangeVehicleTypePatch.cs" />
+    <Compile Include="HarmonyPatches\CargoTruckAIPatch\StartPathFindPatch.cs" />
+    <Compile Include="HarmonyPatches\CargoTruckAIPatch\Transpiler\VehicleTypeReplacingTranspiler.cs" />
     <Compile Include="HarmonyPatches\FerryAIPatch\SimulationStepPatch.cs" />
     <Compile Include="HarmonyPatches\VehicleInfoPatch\InitializePrefabPatch.cs" />
     <Compile Include="ItemClasses.cs" />

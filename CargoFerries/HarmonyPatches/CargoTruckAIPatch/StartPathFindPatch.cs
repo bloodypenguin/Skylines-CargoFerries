@@ -1,0 +1,43 @@
+using System.Reflection;
+using CargoFerries.HarmonyPatches.CargoTruckAIPatch.Transpiler;
+using CargoFerries.Utils;
+using UnityEngine;
+
+namespace CargoFerries.HarmonyPatches.CargoTruckAIPatch
+{
+    public static class StartPathFindPatch
+    {
+        public static void Apply()
+        {
+            PatchUtil.Patch(
+                new PatchUtil.MethodDefinition(typeof(CargoTruckAI), "StartPathFind",
+                    BindingFlags.Default, new[]
+                    {
+                        typeof(ushort),
+                        typeof(Vehicle).MakeByRefType(),
+                        typeof(Vector3),
+                        typeof(Vector3),
+                        typeof(bool),
+                        typeof(bool),
+                        typeof(bool)
+                    }),
+                null, null,
+                new PatchUtil.MethodDefinition(typeof(NeedChangeVehicleTypePatch), (nameof(VehicleTypeReplacingTranspiler.Transpile))));
+        }
+
+        public static void Undo()
+        {
+            PatchUtil.Unpatch(new PatchUtil.MethodDefinition(typeof(CargoTruckAI), "StartPathFind",
+                BindingFlags.Default, new[]
+                {
+                    typeof(ushort),
+                    typeof(Vehicle).MakeByRefType(),
+                    typeof(Vector3),
+                    typeof(Vector3),
+                    typeof(bool),
+                    typeof(bool),
+                    typeof(bool)
+                }));
+        }
+    }
+}

@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace CargoFerries.HarmonyPatches.CargoTruckAIPatch
 {
-    public class ChangeVehicleTypePatch
+    public static class ChangeVehicleTypePatch
     {
 
         private static bool isApplied = false;

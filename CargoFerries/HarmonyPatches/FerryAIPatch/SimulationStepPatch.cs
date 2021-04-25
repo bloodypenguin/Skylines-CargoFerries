@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace CargoFerries.HarmonyPatches.FerryAIPatch
 {
-    public class SimulationStepPatch
+    public static class SimulationStepPatch
     {
         public static void Apply()
         {
