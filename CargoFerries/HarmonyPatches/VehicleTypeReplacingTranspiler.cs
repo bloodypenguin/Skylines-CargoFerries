@@ -5,14 +5,14 @@ using System.Reflection.Emit;
 using Harmony;
 using UnityEngine;
 
-namespace CargoFerries.HarmonyPatches.CargoTruckAIPatch.Transpiler
+namespace CargoFerries.HarmonyPatches
 {
     public static class VehicleTypeReplacingTranspiler
     {
         public static IEnumerable<CodeInstruction> Transpile(MethodBase original,
             IEnumerable<CodeInstruction> instructions)
         {
-            Debug.Log("Barges: Transpiling method: " + original.DeclaringType + "." + original);
+            Debug.Log("Barges: VehicleTypeReplacingTranspiler - Transpiling method: " + original.DeclaringType + "." + original);
             var codes = new List<CodeInstruction>(instructions);
             var newCodes = new List<CodeInstruction>();
             foreach (var codeInstruction in codes)
@@ -30,8 +30,7 @@ namespace CargoFerries.HarmonyPatches.CargoTruckAIPatch.Transpiler
                     }
                     ;
                 newCodes.Add(newInstruction);
-                Debug.LogWarning(
-                    $"Barges: Replaced vehicle type with {newInstruction.operand}");
+                Debug.Log($"Barges: VehicleTypeReplacingTranspiler - Replaced vehicle type with {newInstruction.operand}");
             }
 
             return newCodes.AsEnumerable();

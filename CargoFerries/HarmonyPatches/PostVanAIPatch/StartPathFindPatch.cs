@@ -2,14 +2,14 @@ using System.Reflection;
 using CargoFerries.Utils;
 using UnityEngine;
 
-namespace CargoFerries.HarmonyPatches.CargoTruckAIPatch
+namespace CargoFerries.HarmonyPatches.PostVanAIPatch
 {
     public static class StartPathFindPatch
     {
         public static void Apply()
         {
             PatchUtil.Patch(
-                new PatchUtil.MethodDefinition(typeof(CargoTruckAI), "StartPathFind",
+                new PatchUtil.MethodDefinition(typeof(PostVanAI), "StartPathFind",
                     BindingFlags.Default, new[]
                     {
                         typeof(ushort),
@@ -26,7 +26,7 @@ namespace CargoFerries.HarmonyPatches.CargoTruckAIPatch
 
         public static void Undo()
         {
-            PatchUtil.Unpatch(new PatchUtil.MethodDefinition(typeof(CargoTruckAI), "StartPathFind",
+            PatchUtil.Unpatch(new PatchUtil.MethodDefinition(typeof(PostVanAI), "StartPathFind",
                 BindingFlags.Default, new[]
                 {
                     typeof(ushort),

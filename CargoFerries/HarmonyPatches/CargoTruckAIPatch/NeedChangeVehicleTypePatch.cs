@@ -1,5 +1,4 @@
 using System.Reflection;
-using CargoFerries.HarmonyPatches.CargoTruckAIPatch.Transpiler;
 using CargoFerries.Utils;
 
 namespace CargoFerries.HarmonyPatches.CargoTruckAIPatch
