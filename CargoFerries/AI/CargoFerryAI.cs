@@ -198,7 +198,6 @@ public class CargoFerryAI : FerryAI
       this.RemoveSource(vehicleID, ref data);
       this.RemoveTarget(vehicleID, ref data);
       base.ReleaseVehicle(vehicleID, ref data);
-      UnityEngine.Debug.Log(new System.Diagnostics.StackTrace().ToString());
     }
     
     private void RemoveSource(ushort vehicleID, ref Vehicle data)
