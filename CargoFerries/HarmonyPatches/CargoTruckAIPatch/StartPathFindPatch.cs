@@ -22,7 +22,7 @@ namespace CargoFerries.HarmonyPatches.CargoTruckAIPatch
                         typeof(bool)
                     }),
                 null, null,
-                new PatchUtil.MethodDefinition(typeof(NeedChangeVehicleTypePatch), (nameof(VehicleTypeReplacingTranspiler.Transpile))));
+                new PatchUtil.MethodDefinition(typeof(VehicleTypeReplacingTranspiler), (nameof(VehicleTypeReplacingTranspiler.Transpile))));
         }
 
         public static void Undo()
