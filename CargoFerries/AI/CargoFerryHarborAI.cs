@@ -33,6 +33,7 @@ namespace CargoFerries.AI
             base.CreateBuilding(buildingID, ref data);
             data.m_seniors = byte.MaxValue;
             data.m_adults = byte.MaxValue;
+            data.m_flags |= Building.Flags.Downgrading;
             if (this.GetTransferReason(buildingID, ref data) != TransferManager.TransferReason.None)
                 return;
             data.m_problems = Notification.AddProblems(data.m_problems, Notification.Problem.ResourceNotSelected);
