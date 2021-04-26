@@ -734,10 +734,6 @@ namespace CargoFerries.AI
         public override bool CanBeRelocated(ushort buildingID, ref Building data) =>
             (int) data.m_customBuffer1 * 100 == 0;
 
-        public override bool CanBeEmptied() => true;
-
-        public override bool CanBeEmptied(ushort buildingID, ref Building data) => true;
-
         public TransferManager.TransferReason GetTransferReason(
             ushort buildingID,
             ref Building data)
