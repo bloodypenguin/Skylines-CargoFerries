@@ -284,8 +284,16 @@ namespace CargoFerries.AI
         VehicleInfo info = instance.m_vehicles.m_buffer[(int) vehicleID1].Info;
         if (data.m_targetBuilding != (ushort) 0)
         {
-          info.m_vehicleAI.SetSource(vehicleID1, ref instance.m_vehicles.m_buffer[(int) vehicleID1], data.m_targetBuilding);
-          info.m_vehicleAI.SetTarget(vehicleID1, ref instance.m_vehicles.m_buffer[(int) vehicleID1], instance.m_vehicles.m_buffer[(int) vehicleID1].m_targetBuilding);
+          if (data.m_targetBuilding == instance.m_vehicles.m_buffer[(int) vehicleID1].m_targetBuilding)
+          {
+            info.m_vehicleAI.ArriveAtDestination(vehicleID1, ref instance.m_vehicles.m_buffer[(int) vehicleID1]);
+            data.Unspawn(vehicleID);
+          }
+          else
+          {
+            info.m_vehicleAI.SetSource(vehicleID1, ref instance.m_vehicles.m_buffer[(int) vehicleID1], data.m_targetBuilding);
+            info.m_vehicleAI.SetTarget(vehicleID1, ref instance.m_vehicles.m_buffer[(int) vehicleID1], instance.m_vehicles.m_buffer[(int) vehicleID1].m_targetBuilding); 
+          }
         }
         vehicleID1 = nextCargo;
         if (++num > CargoFerriesMod.MaxVehicleCount)
