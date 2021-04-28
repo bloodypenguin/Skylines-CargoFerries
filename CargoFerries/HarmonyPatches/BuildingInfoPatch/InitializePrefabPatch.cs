@@ -1,12 +1,12 @@
 using System;
 using CargoFerries.AI;
+using CargoFerries.OptionsFramework;
 using CargoFerries.Utils;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace CargoFerries.HarmonyPatches.BuildingInfoPatch
 {
-    
     public static class InitializePrefabPatch
     {
         private static bool deployed;
@@ -19,7 +19,8 @@ namespace CargoFerries.HarmonyPatches.BuildingInfoPatch
             }
 
             PatchUtil.Patch(
-                new PatchUtil.MethodDefinition(typeof(global::BuildingInfo), nameof(global::BuildingInfo.InitializePrefab)),
+                new PatchUtil.MethodDefinition(typeof(global::BuildingInfo),
+                    nameof(global::BuildingInfo.InitializePrefab)),
                 new PatchUtil.MethodDefinition(typeof(InitializePrefabPatch), nameof(PreInitializePrefab)));
 
             deployed = true;
@@ -33,7 +34,8 @@ namespace CargoFerries.HarmonyPatches.BuildingInfoPatch
             }
 
             PatchUtil.Unpatch(
-                new PatchUtil.MethodDefinition(typeof(global::BuildingInfo), nameof(global::BuildingInfo.InitializePrefab)));
+                new PatchUtil.MethodDefinition(typeof(global::BuildingInfo),
+                    nameof(global::BuildingInfo.InitializePrefab)));
 
             deployed = false;
         }
@@ -49,7 +51,10 @@ namespace CargoFerries.HarmonyPatches.BuildingInfoPatch
 
                 var oldAi = __instance.GetComponent<CargoHarborAI>();
                 Object.DestroyImmediate(oldAi);
-                var ai = __instance.gameObject.AddComponent<CargoFerryHarborAI>();
+                var ai = (SteamHelper.IsDLCOwned(SteamHelper.DLC.IndustryDLC) &
+                          OptionsWrapper<Options>.Options.EnableWarehouseAI)
+                    ? __instance.gameObject.AddComponent<CargoFerryWarehouseHarborAI>()
+                    : __instance.gameObject.AddComponent<CargoFerryHarborAI>();
                 PrefabUtil.TryCopyAttributes(oldAi, ai, false);
             }
             catch (Exception e)
