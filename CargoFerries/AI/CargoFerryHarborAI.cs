@@ -11,6 +11,20 @@ namespace CargoFerries.AI
     {
         [NonSerialized] protected float m_quayOffset;
 
+        public static bool IsCargoFerryHarbor(Building station)
+        {
+            if (station.m_flags == Building.Flags.None)
+            {
+                return false;
+            }
+            if (station.Info == null)
+            {
+                return false;
+            }
+            return station.Info.m_buildingAI is CargoFerryHarborAI;
+        }
+        
+        
         public override void InitializePrefab()
         {
             base.InitializePrefab();

@@ -1,9 +1,14 @@
-﻿using ICities;
+﻿using CargoFerries.OptionsFramework;
+using ICities;
+using UnityEngine;
+using Util = CargoFerries.Utils.Util;
 
 namespace CargoFerries
 {
     public class LoadingExtension : LoadingExtensionBase
     {
+        private static GameObject _gameObject;
+        
         public override void OnCreated(ILoading loading)
         {
             base.OnCreated(loading);
@@ -35,6 +40,36 @@ namespace CargoFerries
                 HarmonyPatches.CargoTruckAIPatch.ChangeVehicleTypePatch.Apply(); 
             }
         }
+
+        public override void OnLevelLoaded(LoadMode mode)
+        {
+            base.OnLevelLoaded(mode);
+            if (!OptionsWrapper<Options>.Options.EnableWarehouseAI)
+            {
+                return;
+            }
+            if (mode != LoadMode.NewGame && mode != LoadMode.LoadGame)
+            {
+                return;
+            }
+            if (_gameObject != null)
+            {
+                return;
+            }
+            _gameObject = new GameObject("CargoFerries");
+            _gameObject.AddComponent<GamePanelExtender>();
+        }
+
+        public override void OnLevelUnloading()
+        {
+            base.OnLevelUnloading();
+            if (_gameObject == null)
+            {
+                return;
+            }
+            Object.Destroy(_gameObject);
+            _gameObject = null;
+        } 
 
         public override void OnReleased()
         {

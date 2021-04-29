@@ -34,6 +34,7 @@
     <Compile Include="AI\CargoFerryAI.cs" />
     <Compile Include="AI\CargoFerryHarborAI.cs" />
     <Compile Include="AI\CargoFerryWarehouseHarborAI.cs" />
+    <Compile Include="GamePanelExtender.cs" />
     <Compile Include="HarmonyPatches\BuildingInfoPatch\InitializePrefabPatch.cs" />
     <Compile Include="HarmonyPatches\CargoTruckAIPatch\ChangeVehicleTypePatch.cs" />
     <Compile Include="HarmonyPatches\CargoTruckAIPatch\NeedChangeVehicleTypePatch.cs" />
@@ -60,6 +61,7 @@
     <Compile Include="Tuple.cs" />
     <Compile Include="Utils\PatchUtil.cs" />
     <Compile Include="Utils\PrefabUtil.cs" />
+    <Compile Include="Utils\UIUtils.cs" />
     <Compile Include="Utils\Util.cs" />
   </ItemGroup>
   <ItemGroup>
