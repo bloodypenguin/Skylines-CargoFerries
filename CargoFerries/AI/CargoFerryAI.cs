@@ -287,7 +287,7 @@ namespace CargoFerries.AI
           if (data.m_targetBuilding == instance.m_vehicles.m_buffer[(int) vehicleID1].m_targetBuilding)
           {
             info.m_vehicleAI.ArriveAtDestination(vehicleID1, ref instance.m_vehicles.m_buffer[(int) vehicleID1]);
-            data.Unspawn(vehicleID);
+            instance.ReleaseVehicle(vehicleID1);
           }
           else
           {
