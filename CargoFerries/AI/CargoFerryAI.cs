@@ -1,3 +1,4 @@
+using CargoFerries.OptionsFramework;
 using ColossalFramework;
 using ColossalFramework.Math;
 using UnityEngine;
@@ -284,13 +285,24 @@ namespace CargoFerries.AI
         VehicleInfo info = instance.m_vehicles.m_buffer[(int) vehicleID1].Info;
         if (data.m_targetBuilding != (ushort) 0)
         {
-          if (data.m_targetBuilding == instance.m_vehicles.m_buffer[(int) vehicleID1].m_targetBuilding)
+          if (data.m_targetBuilding == instance.m_vehicles.m_buffer[(int) vehicleID1].m_targetBuilding
+              && OptionsWrapper<Options>.Options.EnableWarehouseAI)
           {
             info.m_vehicleAI.ArriveAtDestination(vehicleID1, ref instance.m_vehicles.m_buffer[(int) vehicleID1]);
             instance.ReleaseVehicle(vehicleID1);
           }
           else
           {
+            if (OptionsWrapper<Options>.Options.EnableWarehouseAI)
+            {
+              //we compensate the removal that will happen in SetSource() of CargoTruckAI
+              var amountDelta = -Mathf.Min(0, (int) data.m_transferSize - this.m_cargoCapacity);
+              BuildingManager.instance.m_buildings.m_buffer[data.m_targetBuilding].Info.m_buildingAI
+                .ModifyMaterialBuffer(data.m_targetBuilding,
+                  ref BuildingManager.instance.m_buildings.m_buffer[data.m_targetBuilding],
+                  (TransferManager.TransferReason) instance.m_vehicles.m_buffer[(int) vehicleID1].m_transferType,
+                  ref amountDelta);
+            }
             info.m_vehicleAI.SetSource(vehicleID1, ref instance.m_vehicles.m_buffer[(int) vehicleID1], data.m_targetBuilding);
             info.m_vehicleAI.SetTarget(vehicleID1, ref instance.m_vehicles.m_buffer[(int) vehicleID1], instance.m_vehicles.m_buffer[(int) vehicleID1].m_targetBuilding); 
           }
