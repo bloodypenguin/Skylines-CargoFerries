@@ -717,7 +717,7 @@ namespace CargoFerries.AI
                     instance.m_vehicles.m_buffer[(int) vehicleID].Info.m_vehicleAI.SetTarget(vehicleID,
                         ref instance.m_vehicles.m_buffer[(int) vehicleID], (ushort) 0);
                 vehicleID = nextGuestVehicle;
-                if (++num > 16384)
+                if (++num > CargoFerriesMod.MaxVehicleCount)
                 {
                     CODebugBase<LogChannel>.Error(LogChannel.Core,
                         "Invalid list detected!\n" + System.Environment.StackTrace);
