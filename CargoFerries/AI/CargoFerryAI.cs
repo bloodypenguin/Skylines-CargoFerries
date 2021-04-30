@@ -293,10 +293,10 @@ namespace CargoFerries.AI
           }
           else
           {
-            if (OptionsWrapper<Options>.Options.EnableWarehouseAI)
+            if (OptionsWrapper<Options>.Options.EnableWarehouseAI && info.m_vehicleAI is CargoTruckAI cargoTruckAI)
             {
               //we compensate the removal that will happen in SetSource() of CargoTruckAI
-              var amountDelta = -Mathf.Min(0, (int) data.m_transferSize - this.m_cargoCapacity);
+              var amountDelta = -Mathf.Min(0, (int) instance.m_vehicles.m_buffer[(int) vehicleID1].m_transferSize - cargoTruckAI.m_cargoCapacity);
               BuildingManager.instance.m_buildings.m_buffer[data.m_targetBuilding].Info.m_buildingAI
                 .ModifyMaterialBuffer(data.m_targetBuilding,
                   ref BuildingManager.instance.m_buildings.m_buffer[data.m_targetBuilding],
