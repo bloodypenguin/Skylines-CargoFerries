@@ -89,6 +89,7 @@ namespace CargoFerries.AI
                 transferVehicleService.m_vehicleAI.SetSource(vehicle, ref vehicles.m_buffer[(int) vehicle], buildingID);
                 transferVehicleService.m_vehicleAI.StartTransfer(vehicle, ref vehicles.m_buffer[(int) vehicle],
                     material, offer);
+                VehicleManager.instance.m_vehicles.m_buffer[vehicle].m_touristCount = 1; //to indicate that it's really own truck
                 ushort building = offer.Building;
                 if (building != (ushort) 0 &&
                     (Singleton<BuildingManager>.instance.m_buildings.m_buffer[(int) building].m_flags &
@@ -807,6 +808,59 @@ namespace CargoFerries.AI
             }
 
             return str;
+        }
+
+        //copied from CommonBuildingAI, except for the marked line
+        protected void CalculateOwnVehicles(
+            ushort buildingID,
+            ref Building data,
+            TransferManager.TransferReason material,
+            ref int count,
+            ref int cargo,
+            ref int capacity,
+            ref int outside)
+        {
+            VehicleManager instance = Singleton<VehicleManager>.instance;
+            ushort vehicleID = data.m_ownVehicles;
+            int num = 0;
+            while (vehicleID != (ushort) 0)
+            {
+                //added check for tourist count to distinguish between really own vehicles and transit vehicles
+                if ((TransferManager.TransferReason) instance.m_vehicles.m_buffer[(int) vehicleID].m_transferType ==
+                    material && instance.m_vehicles.m_buffer[(int) vehicleID].m_touristCount == 1)
+                {
+                    int size;
+                    int max;
+                    instance.m_vehicles.m_buffer[(int) vehicleID].Info.m_vehicleAI.GetSize(vehicleID,
+                        ref instance.m_vehicles.m_buffer[(int) vehicleID], out size, out max);
+                    cargo += Mathf.Min(size, max);
+                    capacity += max;
+                    ++count;
+                    if (
+                        (instance.m_vehicles.m_buffer[(int) vehicleID].m_flags &
+                         (Vehicle.Flags.Importing | Vehicle.Flags.Exporting)) != ~(Vehicle.Flags.Created |
+                            Vehicle.Flags.Deleted | Vehicle.Flags.Spawned | Vehicle.Flags.Inverted |
+                            Vehicle.Flags.TransferToTarget | Vehicle.Flags.TransferToSource | Vehicle.Flags.Emergency1 |
+                            Vehicle.Flags.Emergency2 | Vehicle.Flags.WaitingPath | Vehicle.Flags.Stopped |
+                            Vehicle.Flags.Leaving | Vehicle.Flags.Arriving | Vehicle.Flags.Reversed |
+                            Vehicle.Flags.TakingOff | Vehicle.Flags.Flying | Vehicle.Flags.Landing |
+                            Vehicle.Flags.WaitingSpace | Vehicle.Flags.WaitingCargo | Vehicle.Flags.GoingBack |
+                            Vehicle.Flags.WaitingTarget | Vehicle.Flags.Importing | Vehicle.Flags.Exporting |
+                            Vehicle.Flags.Parking | Vehicle.Flags.CustomName | Vehicle.Flags.OnGravel |
+                            Vehicle.Flags.WaitingLoading | Vehicle.Flags.Congestion | Vehicle.Flags.DummyTraffic |
+                            Vehicle.Flags.Underground | Vehicle.Flags.Transition | Vehicle.Flags.InsideBuilding |
+                            Vehicle.Flags.LeftHandDrive))
+                        ++outside;
+                }
+
+                vehicleID = instance.m_vehicles.m_buffer[(int) vehicleID].m_nextOwnVehicle;
+                if (++num > CargoFerriesMod.MaxVehicleCount)
+                {
+                    CODebugBase<LogChannel>.Error(LogChannel.Core,
+                        "Invalid list detected!\n" + System.Environment.StackTrace);
+                    break;
+                }
+            }
         }
     }
 }
