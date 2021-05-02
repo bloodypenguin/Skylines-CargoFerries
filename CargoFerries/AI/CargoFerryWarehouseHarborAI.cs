@@ -64,8 +64,20 @@ namespace CargoFerries.AI
             }
             else
             {
-                VehicleInfo transferVehicleService = WarehouseAI.GetTransferVehicleService(material,
-                    ItemClass.Level.Level1, ref Singleton<SimulationManager>.instance.m_randomizer);
+                VehicleInfo transferVehicleService;
+                if (material == TransferManager.TransferReason.Fish)
+                {
+                    transferVehicleService = Singleton<VehicleManager>.instance.GetRandomVehicleInfo(
+                        ref Singleton<SimulationManager>.instance.m_randomizer,
+                        ItemClass.Service.Fishing,
+                        ItemClass.SubService.None, ItemClass.Level.Level1, VehicleInfo.VehicleType.Car);
+                }
+                else
+                {
+                    transferVehicleService = WarehouseAI.GetTransferVehicleService(material,
+                        ItemClass.Level.Level1, ref Singleton<SimulationManager>.instance.m_randomizer);     
+                }
+
                 if (transferVehicleService == null)
                     return;
                 Array16<Vehicle> vehicles = Singleton<VehicleManager>.instance.m_vehicles;

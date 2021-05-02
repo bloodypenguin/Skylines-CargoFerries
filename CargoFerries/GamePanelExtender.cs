@@ -16,9 +16,10 @@ namespace CargoFerries
         protected InstanceID m_InstanceID;
         private ushort buildingId = 0;
 
-        private TransferManager.TransferReason[] m_transferReasons = new TransferManager.TransferReason[15]
+        private TransferManager.TransferReason[] m_transferReasons = new TransferManager.TransferReason[16]
         {
             TransferManager.TransferReason.None,
+            TransferManager.TransferReason.Fish,
             TransferManager.TransferReason.AnimalProducts,
             TransferManager.TransferReason.Flours,
             TransferManager.TransferReason.Paper,
