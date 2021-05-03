@@ -811,7 +811,7 @@ namespace CargoFerries.AI
         }
 
         //copied from CommonBuildingAI, except for the marked line
-        protected void CalculateOwnVehicles(
+        protected new void CalculateOwnVehicles(
             ushort buildingID,
             ref Building data,
             TransferManager.TransferReason material,
