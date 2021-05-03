@@ -35,9 +35,8 @@
     <Compile Include="AI\CargoFerryHarborAI.cs" />
     <Compile Include="AI\CargoFerryWarehouseHarborAI.cs" />
     <Compile Include="Attributes\HideInGameOrEditorConditionAttribute.cs" />
-    <Compile Include="Attributes\HideWhenNotCargoHarborAIAttribute.cs" />
-    <Compile Include="Attributes\HideWhenNotCargoShipAIAttribute.cs" />
-    <Compile Include="EditedAssetTransformer.cs" />
+    <Compile Include="Attributes\HideWhenNotInAssetEditorConditionAttribute.cs" />
+    <Compile Include="CargoFerriesEditedAssetTransformer.cs" />
     <Compile Include="GamePanelExtender.cs" />
     <Compile Include="HarmonyPatches\BuildingInfoPatch\InitializePrefabPatch.cs" />
     <Compile Include="HarmonyPatches\CargoTruckAIPatch\ChangeVehicleTypePatch.cs" />
