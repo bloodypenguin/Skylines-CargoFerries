@@ -43,6 +43,7 @@
     <Compile Include="HarmonyPatches\PostVanAIPatch\StartPathFindPatch.cs" />
     <Compile Include="HarmonyPatches\VehicleInfoPatch\InitializePrefabPatch.cs" />
     <Compile Include="HarmonyPatches\VehicleTypeReplacingTranspiler.cs" />
+    <Compile Include="HideInGameOrEditorConditionAttribute.cs" />
     <Compile Include="ItemClasses.cs" />
     <Compile Include="CargoFerriesMod.cs" />
     <Compile Include="LoadingExtension.cs" />
