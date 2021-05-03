@@ -3,6 +3,7 @@ using System.Reflection;
 
 namespace CargoFerries.OptionsFramework.Attibutes
 {
+    [AttributeUsage(AttributeTargets.Property)]
     public abstract class AbstractOptionsAttribute : Attribute
     {
         protected AbstractOptionsAttribute(string description, string group, string actionClass, string actionMethod)
@@ -30,6 +31,23 @@ namespace CargoFerries.OptionsFramework.Attibutes
             return s =>
             {
                 method.Invoke(null, new object[] { s });
+            };
+        }
+
+        public Action Action()
+        {
+            if (ActionClass == null || ActionMethod == null)
+            {
+                return () => { };
+            }
+            var method = Util.FindType(ActionClass).GetMethod(ActionMethod, BindingFlags.Public | BindingFlags.Static);
+            if (method == null)
+            {
+                return () => { };
+            }
+            return () =>
+            {
+                method.Invoke(null, new object[] { });
             };
         }
 
