@@ -11,7 +11,7 @@
     <AssemblyName>CargoFerries</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <LangVersion>8</LangVersion>
+    <LangVersion>9</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -34,6 +34,10 @@
     <Compile Include="AI\CargoFerryAI.cs" />
     <Compile Include="AI\CargoFerryHarborAI.cs" />
     <Compile Include="AI\CargoFerryWarehouseHarborAI.cs" />
+    <Compile Include="Attributes\HideInGameOrEditorConditionAttribute.cs" />
+    <Compile Include="Attributes\HideWhenNotCargoHarborAIAttribute.cs" />
+    <Compile Include="Attributes\HideWhenNotCargoShipAIAttribute.cs" />
+    <Compile Include="EditedAssetTransformer.cs" />
     <Compile Include="GamePanelExtender.cs" />
     <Compile Include="HarmonyPatches\BuildingInfoPatch\InitializePrefabPatch.cs" />
     <Compile Include="HarmonyPatches\CargoTruckAIPatch\ChangeVehicleTypePatch.cs" />
@@ -43,7 +47,6 @@
     <Compile Include="HarmonyPatches\PostVanAIPatch\StartPathFindPatch.cs" />
     <Compile Include="HarmonyPatches\VehicleInfoPatch\InitializePrefabPatch.cs" />
     <Compile Include="HarmonyPatches\VehicleTypeReplacingTranspiler.cs" />
-    <Compile Include="HideInGameOrEditorConditionAttribute.cs" />
     <Compile Include="ItemClasses.cs" />
     <Compile Include="CargoFerriesMod.cs" />
     <Compile Include="LoadingExtension.cs" />

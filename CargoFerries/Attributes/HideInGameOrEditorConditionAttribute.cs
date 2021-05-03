@@ -1,7 +1,7 @@
 using System;
 using CargoFerries.OptionsFramework.Attibutes;
 
-namespace CargoFerries
+namespace CargoFerries.Attributes
 {
     [AttributeUsage(AttributeTargets.Property)]
     public class HideInGameOrEditorConditionAttribute : HideConditionAttribute
