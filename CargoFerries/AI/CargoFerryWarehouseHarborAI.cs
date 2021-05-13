@@ -9,10 +9,10 @@ namespace CargoFerries.AI
     //based of CargoHarborAI but without animals, connections & checking height
     public class CargoFerryWarehouseHarborAI : CargoFerryHarborAI
     {
-        [CustomizableProperty("Truck Count")] public int m_truckCount = 30;
+        [CustomizableProperty("Truck Count")] public int m_truckCount = 25;
 
         [CustomizableProperty("Storage Capacity")]
-        public int m_storageCapacity = 1000000;
+        public int m_storageCapacity = 350000;
 
         [CustomizableProperty("Storage Type")]
         public TransferManager.TransferReason m_storageType = TransferManager.TransferReason.None;
