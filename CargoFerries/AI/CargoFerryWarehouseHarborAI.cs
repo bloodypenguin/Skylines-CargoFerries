@@ -803,7 +803,9 @@ namespace CargoFerries.AI
                 int num3 = 0;
                 if (num2 != 0)
                     num3 = Mathf.Max(1, num2 * 100 / this.m_storageCapacity);
-                str = str + LocaleFormatter.FormatGeneric("AIINFO_FULL", (object) num3) + System.Environment.NewLine +
+                int num = (int) data.m_customBuffer1 * 100;
+                str = str + StringUtils.SafeFormat(ColossalFramework.Globalization.Locale.Get("INDUSTRYPANEL_BUFFERTOOLTIP"), (object) IndustryWorldInfoPanel.FormatResource((ulong) (uint) num), (object) IndustryWorldInfoPanel.FormatResourceWithUnit((uint) m_storageCapacity, actualTransferReason))
+                + " (" + LocaleFormatter.FormatGeneric("AIINFO_FULL", (object) num3) + ")" + System.Environment.NewLine +
                       LocaleFormatter.FormatGeneric("AIINFO_INDUSTRY_VEHICLES", (object) count, (object) num1);
             }
 
