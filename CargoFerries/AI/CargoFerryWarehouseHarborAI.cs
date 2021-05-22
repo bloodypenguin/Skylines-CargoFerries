@@ -67,10 +67,7 @@ namespace CargoFerries.AI
                 VehicleInfo transferVehicleService;
                 if (material == TransferManager.TransferReason.Fish)
                 {
-                    transferVehicleService = Singleton<VehicleManager>.instance.GetRandomVehicleInfo(
-                        ref Singleton<SimulationManager>.instance.m_randomizer,
-                        ItemClass.Service.Fishing,
-                        ItemClass.SubService.None, ItemClass.Level.Level1, VehicleInfo.VehicleType.Car);
+                    transferVehicleService = GetTransferVehicleService(buildingID, ref data);
                 }
                 else
                 {
@@ -103,6 +100,14 @@ namespace CargoFerries.AI
 
                 data.m_outgoingProblemTimer = (byte) 0;
             }
+        }
+        
+        //patch me if you want to select vehicle per building / district
+        private static VehicleInfo GetTransferVehicleService(ushort buildingID, ref Building data)
+        {
+            return Singleton<VehicleManager>.instance.GetRandomVehicleInfo(
+                ref Singleton<SimulationManager>.instance.m_randomizer, ItemClass.Service.Fishing,
+                ItemClass.SubService.None, ItemClass.Level.Level1, VehicleInfo.VehicleType.Car);
         }
 
         public override void ModifyMaterialBuffer(
