@@ -4,12 +4,12 @@ using System.Reflection;
 using System.Reflection.Emit;
 using CargoFerries.Utils;
 using ColossalFramework;
-using Harmony;
+using HarmonyLib;
 using UnityEngine;
 
 namespace CargoFerries.HarmonyPatches.CargoTruckAIPatch
 {
-    public static class ChangeVehicleTypePatch
+    internal static class ChangeVehicleTypePatch
     {
 
         private static bool isApplied = false;

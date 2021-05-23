@@ -16,7 +16,7 @@ namespace CargoFerries.Utils
             var field = type.GetField(fieldName, bindFlags);
             if (field == null)
             {
-                throw new Exception(string.Format("Type '{0}' doesn't have field '{1}", type, fieldName));
+                throw new Exception($"Type '{type}' doesn't have field '{fieldName}");
             }
             return field.GetValue(instance);
         }

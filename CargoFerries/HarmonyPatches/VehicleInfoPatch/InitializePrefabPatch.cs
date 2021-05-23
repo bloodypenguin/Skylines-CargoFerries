@@ -6,7 +6,7 @@ using Object = UnityEngine.Object;
 
 namespace CargoFerries.HarmonyPatches.VehicleInfoPatch
 {
-    public static class InitializePrefabPatch
+    internal static class InitializePrefabPatch
     {
         private static bool deployed;
 

@@ -4,12 +4,12 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using CargoFerries.Utils;
-using Harmony;
+using HarmonyLib;
 using UnityEngine;
 
 namespace CargoFerries.HarmonyPatches.FerryAIPatch
 {
-    public static class SimulationStepPatch
+    internal static class SimulationStepPatch
     {
         public static void Apply()
         {

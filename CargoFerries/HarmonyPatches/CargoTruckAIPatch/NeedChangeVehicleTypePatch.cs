@@ -3,7 +3,7 @@ using CargoFerries.Utils;
 
 namespace CargoFerries.HarmonyPatches.CargoTruckAIPatch
 {
-    public static class NeedChangeVehicleTypePatch
+    internal static class NeedChangeVehicleTypePatch
     {
         public static void Apply()
         {

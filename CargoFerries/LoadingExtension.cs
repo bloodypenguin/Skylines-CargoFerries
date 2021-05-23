@@ -1,4 +1,5 @@
 ﻿using CargoFerries.OptionsFramework;
+using CitiesHarmony.API;
 using ICities;
 using UnityEngine;
 using Util = CargoFerries.Utils.Util;
@@ -14,6 +15,10 @@ namespace CargoFerries
             base.OnCreated(loading);
             ItemClasses.Register();
             if (loading.currentMode != AppMode.Game)
+            {
+                return;
+            }
+            if (!HarmonyHelper.IsHarmonyInstalled)
             {
                 return;
             }
@@ -74,6 +79,11 @@ namespace CargoFerries
         public override void OnReleased()
         {
             base.OnReleased();
+            ItemClasses.Unregister();
+            if (!HarmonyHelper.IsHarmonyInstalled)
+            {
+                return;
+            }
             HarmonyPatches.BuildingInfoPatch.InitializePrefabPatch.Undo();
             HarmonyPatches.FerryAIPatch.SimulationStepPatch.Undo();
             HarmonyPatches.VehicleInfoPatch.InitializePrefabPatch.Undo();
@@ -81,7 +91,6 @@ namespace CargoFerries
             HarmonyPatches.CargoTruckAIPatch.StartPathFindPatch.Undo();
             HarmonyPatches.PostVanAIPatch.StartPathFindPatch.Undo();
             HarmonyPatches.CargoTruckAIPatch.ChangeVehicleTypePatch.Undo();
-            ItemClasses.Unregister();
         }
     }
 }

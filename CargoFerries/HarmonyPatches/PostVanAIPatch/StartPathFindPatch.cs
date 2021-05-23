@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace CargoFerries.HarmonyPatches.PostVanAIPatch
 {
-    public static class StartPathFindPatch
+    internal static class StartPathFindPatch
     {
         public static void Apply()
         {

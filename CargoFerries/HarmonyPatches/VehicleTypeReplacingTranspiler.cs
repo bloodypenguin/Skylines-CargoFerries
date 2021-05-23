@@ -2,12 +2,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using Harmony;
+using HarmonyLib;
 using UnityEngine;
 
 namespace CargoFerries.HarmonyPatches
 {
-    public static class VehicleTypeReplacingTranspiler
+    internal static class VehicleTypeReplacingTranspiler
     {
         public static IEnumerable<CodeInstruction> Transpile(MethodBase original,
             IEnumerable<CodeInstruction> instructions)
