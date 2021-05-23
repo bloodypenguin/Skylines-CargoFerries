@@ -28,6 +28,7 @@ namespace CargoFerries
             HarmonyPatches.CargoTruckAIPatch.NeedChangeVehicleTypePatch.Apply();
             HarmonyPatches.CargoTruckAIPatch.StartPathFindPatch.Apply();
             HarmonyPatches.PostVanAIPatch.StartPathFindPatch.Apply();
+            HarmonyPatches.PathFindPatch.ProcessItemPatch.Apply();
             if (Util.IsModActive(1764208250))
             {
                 UnityEngine.Debug.LogWarning("Barges: More Vehicles is enabled, applying compatibility workaround");
@@ -91,6 +92,7 @@ namespace CargoFerries
             HarmonyPatches.CargoTruckAIPatch.StartPathFindPatch.Undo();
             HarmonyPatches.PostVanAIPatch.StartPathFindPatch.Undo();
             HarmonyPatches.CargoTruckAIPatch.ChangeVehicleTypePatch.Undo();
+            HarmonyPatches.PathFindPatch.ProcessItemPatch.Undo();
         }
     }
 }
