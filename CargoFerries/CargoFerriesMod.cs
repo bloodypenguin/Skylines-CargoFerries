@@ -1,4 +1,5 @@
 ﻿using CargoFerries.OptionsFramework.Extensions;
+using CitiesHarmony.API;
 using ICities;
 
 namespace CargoFerries
@@ -13,6 +14,10 @@ namespace CargoFerries
         public void OnSettingsUI(UIHelperBase helper)
         {
             helper.AddOptionsGroup<Options>();
+        }
+        
+        public void OnEnabled() {
+            HarmonyHelper.EnsureHarmonyInstalled();
         }
     }
 }

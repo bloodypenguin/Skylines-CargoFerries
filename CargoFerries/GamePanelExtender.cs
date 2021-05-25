@@ -108,6 +108,8 @@ namespace CargoFerries
 
             if (!_cityServiceInfoPanel.component.isVisible)
             {
+                m_dropdownResource.ClosePopup();
+                m_dropdownMode.ClosePopup();
                 return;
             }
 
