@@ -34,7 +34,7 @@ namespace CargoFerries.AI
             data.m_flags |= Building.Flags.Downgrading;
             if (this.GetTransferReason(buildingID, ref data) != TransferManager.TransferReason.None)
                 return;
-            data.m_problems = Notification.AddProblems(data.m_problems, Notification.Problem.ResourceNotSelected);
+            data.m_problems = Notification.AddProblems(Notification.Problem1.ResourceNotSelected, Notification.Problem2.None);
         }
 
         public override void SimulationStep(
@@ -447,10 +447,10 @@ namespace CargoFerries.AI
                 }
             }
 
-            Notification.Problem problems = data.m_problems;
+            Notification.ProblemStruct problems = data.m_problems;
             data.m_problems = material != TransferManager.TransferReason.None
-                ? Notification.RemoveProblems(data.m_problems, Notification.Problem.ResourceNotSelected)
-                : Notification.AddProblems(data.m_problems, Notification.Problem.ResourceNotSelected);
+                ? Notification.RemoveProblems(data.m_problems, new Notification.ProblemStruct(Notification.Problem1.ResourceNotSelected))
+                : Notification.AddProblems(data.m_problems, new Notification.ProblemStruct(Notification.Problem1.ResourceNotSelected));
             if (data.m_problems == problems)
                 return;
             Singleton<BuildingManager>.instance.UpdateNotifications(buildingID, problems, data.m_problems);
