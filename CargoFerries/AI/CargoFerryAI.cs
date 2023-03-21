@@ -341,32 +341,32 @@ namespace CargoFerries.AI
 
     //UI stuff
     
-    public override Color GetColor(
-      ushort vehicleID,
-      ref Vehicle data,
-      InfoManager.InfoMode infoMode)
+  public override Color GetColor(
+    ushort vehicleID,
+    ref Vehicle data,
+    InfoManager.InfoMode infoMode,
+    InfoManager.SubInfoMode subInfoMode)
+  {
+    switch (infoMode)
     {
-      switch (infoMode)
-      {
-        case InfoManager.InfoMode.Transport:
-          return Singleton<TransportManager>.instance.m_properties.m_transportColors[(int) this.m_transportInfo.m_transportType];
-        case InfoManager.InfoMode.Connections:
-          InfoManager.SubInfoMode currentSubMode = Singleton<InfoManager>.instance.CurrentSubMode;
-          TransferManager.TransferReason transferType = (TransferManager.TransferReason) data.m_transferType;
-          if (currentSubMode == InfoManager.SubInfoMode.Default && (data.m_flags & Vehicle.Flags.Importing) != ~(Vehicle.Flags.Created | Vehicle.Flags.Deleted | Vehicle.Flags.Spawned | Vehicle.Flags.Inverted | Vehicle.Flags.TransferToTarget | Vehicle.Flags.TransferToSource | Vehicle.Flags.Emergency1 | Vehicle.Flags.Emergency2 | Vehicle.Flags.WaitingPath | Vehicle.Flags.Stopped | Vehicle.Flags.Leaving | Vehicle.Flags.Arriving | Vehicle.Flags.Reversed | Vehicle.Flags.TakingOff | Vehicle.Flags.Flying | Vehicle.Flags.Landing | Vehicle.Flags.WaitingSpace | Vehicle.Flags.WaitingCargo | Vehicle.Flags.GoingBack | Vehicle.Flags.WaitingTarget | Vehicle.Flags.Importing | Vehicle.Flags.Exporting | Vehicle.Flags.Parking | Vehicle.Flags.CustomName | Vehicle.Flags.OnGravel | Vehicle.Flags.WaitingLoading | Vehicle.Flags.Congestion | Vehicle.Flags.DummyTraffic | Vehicle.Flags.Underground | Vehicle.Flags.Transition | Vehicle.Flags.InsideBuilding | Vehicle.Flags.LeftHandDrive) && transferType != TransferManager.TransferReason.None)
-            return Singleton<TransferManager>.instance.m_properties.m_resourceColors[(int) transferType];
-          return currentSubMode == InfoManager.SubInfoMode.WaterPower && (data.m_flags & Vehicle.Flags.Exporting) != ~(Vehicle.Flags.Created | Vehicle.Flags.Deleted | Vehicle.Flags.Spawned | Vehicle.Flags.Inverted | Vehicle.Flags.TransferToTarget | Vehicle.Flags.TransferToSource | Vehicle.Flags.Emergency1 | Vehicle.Flags.Emergency2 | Vehicle.Flags.WaitingPath | Vehicle.Flags.Stopped | Vehicle.Flags.Leaving | Vehicle.Flags.Arriving | Vehicle.Flags.Reversed | Vehicle.Flags.TakingOff | Vehicle.Flags.Flying | Vehicle.Flags.Landing | Vehicle.Flags.WaitingSpace | Vehicle.Flags.WaitingCargo | Vehicle.Flags.GoingBack | Vehicle.Flags.WaitingTarget | Vehicle.Flags.Importing | Vehicle.Flags.Exporting | Vehicle.Flags.Parking | Vehicle.Flags.CustomName | Vehicle.Flags.OnGravel | Vehicle.Flags.WaitingLoading | Vehicle.Flags.Congestion | Vehicle.Flags.DummyTraffic | Vehicle.Flags.Underground | Vehicle.Flags.Transition | Vehicle.Flags.InsideBuilding | Vehicle.Flags.LeftHandDrive) && transferType != TransferManager.TransferReason.None ? Singleton<TransferManager>.instance.m_properties.m_resourceColors[(int) transferType] : Singleton<InfoManager>.instance.m_properties.m_neutralColor;
-        case InfoManager.InfoMode.TrafficRoutes:
-          if (Singleton<InfoManager>.instance.CurrentSubMode == InfoManager.SubInfoMode.Default)
-          {
-            InstanceID empty = InstanceID.Empty;
-            empty.Vehicle = vehicleID;
-            return Singleton<NetManager>.instance.PathVisualizer.IsPathVisible(empty) ? Singleton<InfoManager>.instance.m_properties.m_routeColors[3] : Singleton<InfoManager>.instance.m_properties.m_neutralColor;
-          }
-          break;
-      }
-      return base.GetColor(vehicleID, ref data, infoMode);
+      case InfoManager.InfoMode.Transport:
+        return Singleton<TransportManager>.instance.m_properties.m_transportColors[(int) this.m_transportInfo.m_transportType];
+      case InfoManager.InfoMode.Connections:
+        TransferManager.TransferReason transferType = (TransferManager.TransferReason) data.m_transferType;
+        if (subInfoMode == InfoManager.SubInfoMode.Default && (data.m_flags & Vehicle.Flags.Importing) != ~(Vehicle.Flags.Created | Vehicle.Flags.Deleted | Vehicle.Flags.Spawned | Vehicle.Flags.Inverted | Vehicle.Flags.TransferToTarget | Vehicle.Flags.TransferToSource | Vehicle.Flags.Emergency1 | Vehicle.Flags.Emergency2 | Vehicle.Flags.WaitingPath | Vehicle.Flags.Stopped | Vehicle.Flags.Leaving | Vehicle.Flags.Arriving | Vehicle.Flags.Reversed | Vehicle.Flags.TakingOff | Vehicle.Flags.Flying | Vehicle.Flags.Landing | Vehicle.Flags.WaitingSpace | Vehicle.Flags.WaitingCargo | Vehicle.Flags.GoingBack | Vehicle.Flags.WaitingTarget | Vehicle.Flags.Importing | Vehicle.Flags.Exporting | Vehicle.Flags.Parking | Vehicle.Flags.CustomName | Vehicle.Flags.OnGravel | Vehicle.Flags.WaitingLoading | Vehicle.Flags.Congestion | Vehicle.Flags.DummyTraffic | Vehicle.Flags.Underground | Vehicle.Flags.Transition | Vehicle.Flags.InsideBuilding | Vehicle.Flags.LeftHandDrive) && transferType != TransferManager.TransferReason.None)
+          return Singleton<TransferManager>.instance.m_properties.m_resourceColors[(int) transferType];
+        return subInfoMode == InfoManager.SubInfoMode.WaterPower && (data.m_flags & Vehicle.Flags.Exporting) != ~(Vehicle.Flags.Created | Vehicle.Flags.Deleted | Vehicle.Flags.Spawned | Vehicle.Flags.Inverted | Vehicle.Flags.TransferToTarget | Vehicle.Flags.TransferToSource | Vehicle.Flags.Emergency1 | Vehicle.Flags.Emergency2 | Vehicle.Flags.WaitingPath | Vehicle.Flags.Stopped | Vehicle.Flags.Leaving | Vehicle.Flags.Arriving | Vehicle.Flags.Reversed | Vehicle.Flags.TakingOff | Vehicle.Flags.Flying | Vehicle.Flags.Landing | Vehicle.Flags.WaitingSpace | Vehicle.Flags.WaitingCargo | Vehicle.Flags.GoingBack | Vehicle.Flags.WaitingTarget | Vehicle.Flags.Importing | Vehicle.Flags.Exporting | Vehicle.Flags.Parking | Vehicle.Flags.CustomName | Vehicle.Flags.OnGravel | Vehicle.Flags.WaitingLoading | Vehicle.Flags.Congestion | Vehicle.Flags.DummyTraffic | Vehicle.Flags.Underground | Vehicle.Flags.Transition | Vehicle.Flags.InsideBuilding | Vehicle.Flags.LeftHandDrive) && transferType != TransferManager.TransferReason.None ? Singleton<TransferManager>.instance.m_properties.m_resourceColors[(int) transferType] : Singleton<InfoManager>.instance.m_properties.m_neutralColor;
+      case InfoManager.InfoMode.TrafficRoutes:
+        if (subInfoMode == InfoManager.SubInfoMode.Default)
+        {
+          InstanceID empty = InstanceID.Empty;
+          empty.Vehicle = vehicleID;
+          return Singleton<NetManager>.instance.PathVisualizer.IsPathVisible(empty) ? Singleton<InfoManager>.instance.m_properties.m_routeColors[3] : Singleton<InfoManager>.instance.m_properties.m_neutralColor;
+        }
+        break;
     }
+    return base.GetColor(vehicleID, ref data, infoMode, subInfoMode);
+  }
 
     public override string GetLocalizedStatus(
       ushort vehicleID,
