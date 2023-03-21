@@ -8,7 +8,7 @@ namespace CargoFerries
     {
         public static int MaxVehicleCount;
         
-        public string Name => "Barges - P&P Temp Fix";
+        public string Name => "Barges";
         public string Description => "Adds a new type of cargo transport - Barges. They are like cargo ships but use ferry paths & canals";
         
         public void OnSettingsUI(UIHelperBase helper)
