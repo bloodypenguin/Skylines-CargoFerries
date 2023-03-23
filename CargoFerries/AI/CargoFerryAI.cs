@@ -13,6 +13,8 @@ namespace CargoFerries.AI
     
     public TransportInfo m_transportInfo;
 
+    public override VehicleInfo.VehicleCategory vehicleCategory => VehicleInfo.VehicleCategory.CargoShip;
+    
     public override void CreateVehicle(ushort vehicleID, ref Vehicle data)
     {
       base.CreateVehicle(vehicleID, ref data);
