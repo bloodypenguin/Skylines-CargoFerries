@@ -38,6 +38,7 @@
     <Compile Include="Attributes\HideWhenNotInAssetEditorConditionAttribute.cs" />
     <Compile Include="CargoFerriesEditedAssetTransformer.cs" />
     <Compile Include="GamePanelExtender.cs" />
+    <Compile Include="HarmonyPatches\BankVanAIPatch\StartPathFindPatch.cs" />
     <Compile Include="HarmonyPatches\BuildingInfoPatch\InitializePrefabPatch.cs" />
     <Compile Include="HarmonyPatches\CargoTruckAIPatch\ChangeVehicleTypePatch.cs" />
     <Compile Include="HarmonyPatches\CargoTruckAIPatch\NeedChangeVehicleTypePatch.cs" />
